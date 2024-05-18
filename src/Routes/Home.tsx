@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { bgArrayRandom, makeImgPath } from "./Util";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, delay } from "framer-motion";
 
 const Wrapper = styled.div`
   background-color: black;
@@ -50,11 +50,30 @@ const Row = styled(motion.div)`
 const Box = styled(motion.div)<{ bgphoto: string }>`
   background-color: white;
   height: 200px;
-  color: red;
+  color: ${(props) => props.theme.white.lighter};
   font-size: 66px;
   background-image: url(${(props) => props.bgphoto});
   background-size: cover;
   background-position: center center;
+  &:first-child {
+    transform-origin: center left;
+  }
+  &:last-child {
+    transform-origin: center right;
+  }
+`;
+
+const Info = styled(motion.div)`
+  padding: 10px;
+  background-color: ${(props) => props.theme.black.lighter};
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  h4 {
+    text-align: center;
+    font-size: 18px;
+  }
 `;
 
 const rowVariants = {
@@ -66,6 +85,33 @@ const rowVariants = {
   },
   exit: {
     x: -window.outerWidth,
+  },
+};
+
+const boxVariants = {
+  normal: {
+    scale: 1,
+  },
+  hover: {
+    zIndex: 99,
+    scale: 1.3,
+    y: -50,
+    transition: {
+      delay: 0.5,
+      duration: 0.3,
+      type: "tween",
+    },
+  },
+};
+
+const infoVariants = {
+  hover: {
+    opacity: 1,
+    transition: {
+      delay: 0.5,
+      duration: 0.3,
+      type: "tween",
+    },
   },
 };
 
@@ -142,8 +188,17 @@ export default function Home() {
                     .map((movie) => (
                       <Box
                         key={movie.id}
+                        initial="normal"
+                        whileHover="hover"
+                        transition={{ type: "tween" }}
+                        variants={boxVariants}
                         bgphoto={makeImgPath(movie.backdrop_path || "", "w500")}
-                      />
+                      >
+                        <img />
+                        <Info variants={infoVariants}>
+                          <h4>{movie.title}</h4>
+                        </Info>
+                      </Box>
                     ))}
                 </Row>
               </AnimatePresence>

@@ -197,6 +197,7 @@ export default function Home() {
   const [leaving, setLeaving] = useState(false);
 
   const toggleLeving = () => setLeaving((current) => !current);
+
   const onBoxClicked = (
     movieId: number,
     adult: boolean,

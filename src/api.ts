@@ -4,11 +4,18 @@ const BEARER_KEY =
 const BASE_PATH = "https://api.themoviedb.org/3/";
 
 export interface IMovie {
-  id: string;
+  id: number;
   backdrop_path: string;
   poster_path: string;
   title: string;
   overview: string;
+  original_title: string;
+  original_language: string;
+  popularity: number;
+  release_date: string;
+  vote_average: number;
+  vote_count: number;
+  adult: boolean;
 }
 
 export interface IGetMoviesResult {

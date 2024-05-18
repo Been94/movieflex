@@ -1,9 +1,11 @@
-import { IGetMoviesResult, IMovie, getMovies } from "../api";
+import { IGetMoviesResult, getMovies } from "../api";
 import styled from "styled-components";
 import { bgArrayRandom, makeImgPath } from "./Util";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useLayoutEffect, useState } from "react";
-import { motion, AnimatePresence, delay } from "framer-motion";
+import { useLayoutEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useMatch, PathMatch } from "react-router-dom";
 
 const Wrapper = styled.div`
   background-color: black;
@@ -55,6 +57,7 @@ const Box = styled(motion.div)<{ bgphoto: string }>`
   background-image: url(${(props) => props.bgphoto});
   background-size: cover;
   background-position: center center;
+  cursor: pointer;
   &:first-child {
     transform-origin: center left;
   }
@@ -74,6 +77,65 @@ const Info = styled(motion.div)`
     text-align: center;
     font-size: 18px;
   }
+`;
+
+const Overlay = styled(motion.div)`
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+`;
+
+const BigMovie = styled(motion.div)`
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 10px;
+  width: 60vw;
+  height: 70vh;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+`;
+
+const DetailMovie = styled(motion.div)`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 60% 30%;
+  height: 100%;
+  width: 100%;
+`;
+
+const IsAdult = styled(motion.div)`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 20px;
+`;
+
+const IsAdultDetail = styled(motion.div)<{ isAdult: boolean }>`
+  border-radius: 10px;
+  background-color: ${(props) => (props.isAdult ? `green` : `tomato`)};
+  width: 80px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const DetailMovieBottom = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+`;
+
+const DetailMovieTitle = styled.div`
+  font-size: xx-large;
 `;
 
 const rowVariants = {
@@ -115,12 +177,44 @@ const infoVariants = {
   },
 };
 
+const overlayVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 0.7 },
+  exit: { opacity: 0 },
+};
+
 const offset = 6;
 
 export default function Home() {
+  const navigate = useNavigate();
+  const moviePathMatch: PathMatch<string> | null = useMatch(
+    "/movie/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
+  );
+  console.log(moviePathMatch);
+
   const [randomNumber, setRandomNumber] = useState(0);
   const [index, setIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
+
+  const toggleLeving = () => setLeaving((current) => !current);
+  const onBoxClicked = (
+    movieId: number,
+    adult: boolean,
+    title: string,
+    language: string,
+    popularity?: number,
+    releaseDate?: string,
+    voteAverage?: number,
+    voteCount?: number,
+    posterPath?: string
+  ) => {
+    navigate(
+      `/movie/${movieId}/${title}/${releaseDate}/${language}/${popularity}/${voteAverage}/${voteCount}/${posterPath?.replace(
+        "/",
+        ""
+      )}/${adult}`
+    );
+  };
 
   const incraseIndex = () => {
     if (data) {
@@ -135,12 +229,12 @@ export default function Home() {
     }
   };
 
-  const toggleLeving = () => setLeaving((current) => !current);
-
   const { data, isLoading } = useQuery<IGetMoviesResult>({
     queryKey: ["movies", "nowPlaying"],
     queryFn: getMovies,
   });
+
+  const onOverlayClick = () => navigate(-1);
 
   useLayoutEffect(() => {
     async function bgArrayRandomFunction() {
@@ -187,7 +281,21 @@ export default function Home() {
                     .slice(offset * index, offset * index + offset)
                     .map((movie) => (
                       <Box
+                        layoutId={String(movie.id)}
                         key={movie.id}
+                        onClick={() =>
+                          onBoxClicked(
+                            movie.id,
+                            movie.adult,
+                            movie.title,
+                            movie.original_language,
+                            movie.popularity,
+                            movie.release_date,
+                            movie.vote_average,
+                            movie.vote_count,
+                            movie.poster_path
+                          )
+                        }
                         initial="normal"
                         whileHover="hover"
                         transition={{ type: "tween" }}
@@ -203,6 +311,51 @@ export default function Home() {
                 </Row>
               </AnimatePresence>
             </Slider>
+            <AnimatePresence>
+              {moviePathMatch ? (
+                <>
+                  <Overlay
+                    variants={overlayVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    onClick={onOverlayClick}
+                  />
+                  <BigMovie layoutId={moviePathMatch.params.id}>
+                    <DetailMovie>
+                      <IsAdult>
+                        <IsAdultDetail
+                          isAdult={Boolean(moviePathMatch.params.adult)}
+                        >
+                          {Boolean(moviePathMatch.params.adult) ? (
+                            <span>No Adult</span>
+                          ) : (
+                            <span>Adult</span>
+                          )}
+                        </IsAdultDetail>
+                      </IsAdult>
+                      <div
+                        style={{
+                          backgroundImage: `url(${makeImgPath(
+                            "/" + moviePathMatch.params.posterPath!
+                          )})`,
+                          backgroundSize: `contain`,
+                          backgroundRepeat: `no-repeat`,
+                          backgroundPosition: "center",
+                        }}
+                      />
+                      <DetailMovieBottom>
+                        <DetailMovieTitle>
+                          {decodeURIComponent(
+                            moviePathMatch.params.title || "error - 1"
+                          )}
+                        </DetailMovieTitle>
+                      </DetailMovieBottom>
+                    </DetailMovie>
+                  </BigMovie>
+                </>
+              ) : null}
+            </AnimatePresence>
           </>
         )}
       </Wrapper>

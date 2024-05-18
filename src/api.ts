@@ -3,7 +3,8 @@ const BEARER_KEY =
   "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0ZDYxY2U5ZWFmY2JlOTFiMTNhODQxZjA2MGExZWMxNCIsInN1YiI6IjVmNjAzNTA1MzEyMzQ1MDAzOTY1ZmYyMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.tCZ21xfS4oFnkXa17pWIkp-kV2XCJWcGm1CsPd8WYJk";
 const BASE_PATH = "https://api.themoviedb.org/3/";
 
-interface IMovie {
+export interface IMovie {
+  id: string;
   backdrop_path: string;
   poster_path: string;
   title: string;

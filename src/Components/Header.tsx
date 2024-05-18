@@ -59,7 +59,6 @@ const Item = styled.li`
 
 const Search = styled.span`
   color: white;
-  padding-right: 100px;
   display: flex;
   align-items: center;
   position: relative;
@@ -114,7 +113,15 @@ const toggleVariants = {
 const Input = styled(motion.input)`
   transform-origin: right center;
   position: absolute;
-  left: -180px;
+  //left: -180px;
+  right: 0px;
+  padding: 10px 2px;
+  padding-left: 30px;
+  z-index: -1;
+  color: white;
+  font-size: 16px;
+  background-color: transparent;
+  border: 1px solid ${(props) => props.theme.white.lighter};
 `;
 
 export default function Header() {

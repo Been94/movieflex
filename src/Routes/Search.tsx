@@ -1,6 +1,6 @@
 import { ISearchResult, getSearchMovie, getSearchTv } from "../api";
 import styled from "styled-components";
-import { makeImgPath, searchStatus } from "./Util";
+import { dummyDataMsgMake, makeImgPath, searchStatus } from "./Util";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -268,7 +268,7 @@ const rating = (score: number) => {
 export default function Search() {
   const navigate = useNavigate();
   const moviePathMatch: PathMatch<string> | null = useMatch(
-    "/search/latest/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
+    "/search/latest/:searchId/:title/:Date/:language/:overview/:urlPath/:popularity/:vote_average/:vote_count/:adult"
   );
   console.log(moviePathMatch);
 
@@ -316,25 +316,124 @@ export default function Search() {
   const onOverlayClick = () => navigate(-1);
 
   const onBoxClicked = (
-    searchId?: number,
-    adult?: boolean,
-    title?: string,
-    language?: string,
-    popularity?: number,
-    releaseDate?: string,
-    voteAverage?: number,
-    voteCount?: number,
-    posterPath?: string
+    adult: boolean,
+    searchId: number,
+    popularity: number,
+    vote_average: number,
+    vote_count: number,
+    backdrop_path: string,
+    original_language: string,
+    original_title: string,
+    original_name: string,
+    overview: string,
+    poster_path: string,
+    first_air_date: string,
+    release_date: string,
+    title: string,
+    name: string
   ) => {
-    if (voteAverage! >= 5) {
-      voteAverage = 5;
+    if (backdrop_path != undefined) {
+      backdrop_path = backdrop_path.replace("/", "");
+    }
+
+    if (original_language != undefined) {
+      original_language = original_language.replace("/", "");
+    }
+
+    if (original_title != undefined) {
+      original_title = original_title.replace("/", "");
+    }
+
+    if (original_name != undefined) {
+      original_name = original_name.replace("/", "");
+    }
+
+    if (overview != undefined) {
+      overview = overview.replace("/", "");
+    }
+
+    if (poster_path != undefined) {
+      poster_path = poster_path.replace("/", "");
+    }
+
+    if (first_air_date != undefined) {
+      first_air_date = first_air_date.replace("/", "");
+    }
+
+    if (release_date != undefined) {
+      release_date = release_date.replace("/", "");
+    }
+
+    if (title != undefined) {
+      title = title.replace("/", "");
+    }
+
+    if (name != undefined) {
+      name = name.replace("/", "");
+    }
+
+    popularity = Math.round(popularity);
+    vote_average = Math.round(vote_average);
+    vote_count = Math.round(vote_count);
+    if (vote_average >= 5) {
+      vote_average = 5;
+    }
+
+    let tmpName: any;
+    if (original_title !== undefined) {
+      tmpName = original_title;
+    }
+    if (original_name !== undefined) {
+      tmpName = original_name;
+    }
+    if (title !== undefined) {
+      tmpName = title;
+    }
+    if (name !== undefined) {
+      tmpName = name;
+    }
+
+    if (tmpName === undefined || "") {
+      tmpName = undefined;
+    }
+
+    let tmpDate: any;
+
+    if (first_air_date !== undefined) {
+      tmpDate = first_air_date;
+    }
+
+    if (release_date !== undefined) {
+      tmpDate = release_date;
+    }
+
+    if (tmpDate === undefined || "") {
+      tmpDate = undefined;
+    }
+
+    let tmpPath: any;
+    if (backdrop_path !== undefined) {
+      tmpPath = backdrop_path;
+    }
+    if (poster_path !== undefined) {
+      tmpPath = poster_path;
+    }
+
+    if (tmpPath === undefined || "") {
+      tmpPath = undefined;
     }
 
     navigate(
-      `/search/latest/${searchId}/${title}/${releaseDate}/${language}/${popularity}/${voteAverage}/${voteCount}/${posterPath?.replace(
-        "/",
-        ""
-      )}/${adult}`
+      `/search/latest/${searchId}/${dummyDataMsgMake(
+        tmpName!,
+        "title"
+      )}/${dummyDataMsgMake(tmpDate!, "Date")}/${dummyDataMsgMake(
+        original_language,
+        "language"
+      )}/${dummyDataMsgMake(overview, "overview")}/${dummyDataMsgMake(
+        tmpPath!,
+        "urlPath"
+      )}/${popularity}/${vote_average}/${vote_count}/${adult}`
     );
   };
 
@@ -464,21 +563,27 @@ export default function Search() {
                           searchOffSet * searchTvIndex,
                           searchOffSet * searchTvIndex + searchOffSet
                         )
-                        .map((tv) => (
+                        .map((searchTv) => (
                           <Box
-                            layoutId={String(tv.id)}
-                            key={tv.id}
+                            layoutId={String(searchTv.id)}
+                            key={searchTv.id}
                             onClick={() =>
                               onBoxClicked(
-                                tv.id,
-                                tv.adult,
-                                tv.original_name,
-                                tv.original_language,
-                                tv.popularity,
-                                tv.release_date,
-                                tv.vote_average,
-                                tv.vote_count,
-                                tv.poster_path
+                                searchTv.adult,
+                                searchTv.id,
+                                searchTv.popularity,
+                                searchTv.vote_average,
+                                searchTv.vote_count,
+                                searchTv.backdrop_path,
+                                searchTv.original_language,
+                                searchTv.original_title,
+                                searchTv.original_name,
+                                searchTv.overview,
+                                searchTv.poster_path,
+                                searchTv.first_air_date,
+                                searchTv.release_date,
+                                searchTv.title,
+                                searchTv.name
                               )
                             }
                             initial="normal"
@@ -486,13 +591,13 @@ export default function Search() {
                             transition={{ type: "tween" }}
                             variants={boxVariants}
                             bgphoto={makeImgPath(
-                              tv.backdrop_path || "",
+                              searchTv.backdrop_path || "",
                               "w500"
                             )}
                           >
                             <img />
                             <Info variants={infoVariants}>
-                              <h4>{tv.original_name}</h4>
+                              <h4>{searchTv.original_name}</h4>
                             </Info>
                           </Box>
                         ))}
@@ -549,21 +654,27 @@ export default function Search() {
                           searchOffSet * searchMovieIndex,
                           searchOffSet * searchMovieIndex + searchOffSet
                         )
-                        .map((tv) => (
+                        .map((searchTv) => (
                           <Box
-                            layoutId={String(tv.id)}
-                            key={tv.id}
+                            layoutId={String(searchTv.id)}
+                            key={searchTv.id}
                             onClick={() =>
                               onBoxClicked(
-                                tv.id,
-                                tv.adult,
-                                tv.original_name,
-                                tv.original_language,
-                                tv.popularity,
-                                tv.release_date,
-                                tv.vote_average,
-                                tv.vote_count,
-                                tv.poster_path
+                                searchTv.adult,
+                                searchTv.id,
+                                searchTv.popularity,
+                                searchTv.vote_average,
+                                searchTv.vote_count,
+                                searchTv.backdrop_path,
+                                searchTv.original_language,
+                                searchTv.original_title,
+                                searchTv.original_name,
+                                searchTv.overview,
+                                searchTv.poster_path,
+                                searchTv.first_air_date,
+                                searchTv.release_date,
+                                searchTv.title,
+                                searchTv.name
                               )
                             }
                             initial="normal"
@@ -571,13 +682,13 @@ export default function Search() {
                             transition={{ type: "tween" }}
                             variants={boxVariants}
                             bgphoto={makeImgPath(
-                              tv.backdrop_path || "",
+                              searchTv.backdrop_path || "",
                               "w500"
                             )}
                           >
                             <img />
                             <Info variants={infoVariants}>
-                              <h4>{tv.original_name}</h4>
+                              <h4>{searchTv.original_name}</h4>
                             </Info>
                           </Box>
                         ))}

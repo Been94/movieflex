@@ -33,7 +33,7 @@ function App() {
 
           <Route path="/search" element={<Search />}>
             <Route
-              path="latest/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
+              path="latest/:searchId/:title/:Date/:language/:overview/:urlPath/:popularity/:vote_average/:vote_count/:adult"
               element={<Search />}
             >
               <Route path="search/movie/:id" element={<Search />} />

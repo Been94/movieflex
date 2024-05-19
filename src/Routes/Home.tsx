@@ -7,7 +7,7 @@ import {
 import styled from "styled-components";
 import { Status, bgArrayRandom, makeImgPath } from "./Util";
 import { useQuery } from "@tanstack/react-query";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useMatch, PathMatch } from "react-router-dom";
@@ -349,7 +349,8 @@ export default function Home() {
       setRandomNumber(() => result);
       const maxIndex = Math.floor(latestData?.results.length! / offset) - 1;
       setMaxIndex(maxIndex);
-      console.log(result);
+      // console.log(result);
+      //console.log("topRated:", topRatedData?.results.length);
     }
 
     bgArrayRandomFunction();
@@ -474,7 +475,7 @@ export default function Home() {
   return (
     <>
       <Wrapper>
-        {loadingLatest ? (
+        {loadingLatest && loadingTopRated ? (
           <>
             <Loader>
               <span>로딩중</span>
@@ -616,9 +617,44 @@ export default function Home() {
                           <span>{"<"}</span>
                         </LeftBtn>
                       ) : null}
-                      {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <Box2 key={i}>{i}</Box2>
-                      ))}
+
+                      {topRatedData?.results
+                        .slice(
+                          offset * topRatedIndex,
+                          offset * topRatedIndex + offset
+                        )
+                        .map((movie) => (
+                          <Box
+                            layoutId={String(movie.id)}
+                            key={movie.id}
+                            onClick={() =>
+                              onBoxClicked(
+                                movie.id,
+                                movie.adult,
+                                movie.title,
+                                movie.original_language,
+                                movie.popularity,
+                                movie.release_date,
+                                movie.vote_average,
+                                movie.vote_count,
+                                movie.poster_path
+                              )
+                            }
+                            initial="normal"
+                            whileHover="hover"
+                            transition={{ type: "tween" }}
+                            variants={boxVariants}
+                            bgphoto={makeImgPath(
+                              movie.backdrop_path || "",
+                              "w500"
+                            )}
+                          >
+                            <img />
+                            <Info variants={infoVariants}>
+                              <h4>{movie.title}</h4>
+                            </Info>
+                          </Box>
+                        ))}
 
                       {topRatedIndex === maxIndex ? null : (
                         <RightBtn
@@ -667,9 +703,44 @@ export default function Home() {
                           <span>{"<"}</span>
                         </LeftBtn>
                       ) : null}
-                      {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <Box2 key={i}>{i}</Box2>
-                      ))}
+
+                      {upCommingData?.results
+                        .slice(
+                          offset * upCommingIndex,
+                          offset * upCommingIndex + offset
+                        )
+                        .map((movie) => (
+                          <Box
+                            layoutId={String(movie.id)}
+                            key={movie.id}
+                            onClick={() =>
+                              onBoxClicked(
+                                movie.id,
+                                movie.adult,
+                                movie.title,
+                                movie.original_language,
+                                movie.popularity,
+                                movie.release_date,
+                                movie.vote_average,
+                                movie.vote_count,
+                                movie.poster_path
+                              )
+                            }
+                            initial="normal"
+                            whileHover="hover"
+                            transition={{ type: "tween" }}
+                            variants={boxVariants}
+                            bgphoto={makeImgPath(
+                              movie.backdrop_path || "",
+                              "w500"
+                            )}
+                          >
+                            <img />
+                            <Info variants={infoVariants}>
+                              <h4>{movie.title}</h4>
+                            </Info>
+                          </Box>
+                        ))}
 
                       {upCommingIndex === maxIndex ? null : (
                         <RightBtn

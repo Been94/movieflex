@@ -1,5 +1,5 @@
 import {
-  IGetMoviesResult,
+  IHomeMoviesResult,
   getMovies,
   getMoviesTopRated,
   getMoviesUpcoming,
@@ -351,21 +351,21 @@ export default function Tv() {
   const [tvTopRatedLeaving, setTvTopRatedLeaving] = useState(false);
 
   const useGetTvQuerys = () => {
-    const tvLatest = useQuery<IGetMoviesResult>({
+    const tvLatest = useQuery<IHomeMoviesResult>({
       queryKey: ["tv", "tvLatest"],
       queryFn: getTv,
     });
-    const tvAiringToday = useQuery<IGetMoviesResult>({
+    const tvAiringToday = useQuery<IHomeMoviesResult>({
       queryKey: ["tv", "tvAiringToday"],
       queryFn: getTvAiringToday,
     });
 
-    const tvPopular = useQuery<IGetMoviesResult>({
+    const tvPopular = useQuery<IHomeMoviesResult>({
       queryKey: ["tv", "tvPopular"],
       queryFn: getTvPopular,
     });
 
-    const tvTopRated = useQuery<IGetMoviesResult>({
+    const tvTopRated = useQuery<IHomeMoviesResult>({
       queryKey: ["tv", "tvTopRated"],
       queryFn: getTvTopRated,
     });
@@ -530,13 +530,6 @@ export default function Tv() {
       }
     }
   };
-
-  // const { data, isLoading } = useQuery<IGetMoviesResult>({
-  //   queryKey: ["movies", "latest"],
-  //   queryFn: getMovies,
-  // });
-
-  //console.log(randomNumber);
 
   return (
     <>

@@ -1,5 +1,5 @@
 import {
-  IGetMoviesResult,
+  IHomeMoviesResult,
   getMovies,
   getMoviesTopRated,
   getMoviesUpcoming,
@@ -311,21 +311,18 @@ export default function Home() {
   const [upCommingIndex, setUpCommingIndex] = useState(0);
 
   const [maxIndex, setMaxIndex] = useState(0);
-  const [latestLeaving, setLatestLeaving] = useState(false);
-  const [topRatedLeaving, setTopRatedLeaving] = useState(false);
-  const [upCommingLeaving, setUpCommingLeaving] = useState(false);
 
   const useGetMovieQuerys = () => {
-    const latest = useQuery<IGetMoviesResult>({
+    const latest = useQuery<IHomeMoviesResult>({
       queryKey: ["movies", "latest"],
       queryFn: getMovies,
     });
-    const topRated = useQuery<IGetMoviesResult>({
+    const topRated = useQuery<IHomeMoviesResult>({
       queryKey: ["movies", "topRated"],
       queryFn: getMoviesTopRated,
     });
 
-    const upComming = useQuery<IGetMoviesResult>({
+    const upComming = useQuery<IHomeMoviesResult>({
       queryKey: ["movies", "upComming"],
       queryFn: getMoviesUpcoming,
     });
@@ -349,8 +346,6 @@ export default function Home() {
       setRandomNumber(() => result);
       const maxIndex = Math.floor(latestData?.results.length! / offset) - 1;
       setMaxIndex(maxIndex);
-      // console.log(result);
-      //console.log("topRated:", topRatedData?.results.length);
     }
 
     bgArrayRandomFunction();
@@ -440,10 +435,10 @@ export default function Home() {
   return (
     <>
       <Wrapper>
-        {loadingLatest && loadingTopRated ? (
+        {loadingLatest && loadingTopRated && loadingUpComming ? (
           <>
             <Loader>
-              <span>로딩중</span>
+              <span>로딩중...</span>
             </Loader>
           </>
         ) : (

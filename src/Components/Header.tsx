@@ -1,23 +1,12 @@
 import { Link, PathMatch, useMatch } from "react-router-dom";
 import styled from "styled-components";
 import {
-  color,
   motion,
-  scroll,
   useAnimation,
   useMotionValueEvent,
   useScroll,
 } from "framer-motion";
-import {
-  ChangeEvent,
-  HTMLAttributes,
-  InputHTMLAttributes,
-  ReactHTML,
-  ReactHTMLElement,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 

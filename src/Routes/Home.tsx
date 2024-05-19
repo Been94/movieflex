@@ -14,7 +14,7 @@ import { useMatch, PathMatch } from "react-router-dom";
 
 const Wrapper = styled.div`
   background-color: black;
-  height: 50vh;
+  height: 60vh;
 `;
 
 const Loader = styled.div`

@@ -140,7 +140,7 @@ const BigMovie = styled(motion.div)`
   border: 1px solid white;
   border-radius: 10px;
   width: 60vw;
-  height: 70vh;
+  height: 80vh;
   top: 0;
   bottom: 0;
   left: 0;
@@ -591,7 +591,7 @@ export default function Search() {
                             transition={{ type: "tween" }}
                             variants={boxVariants}
                             bgphoto={makeImgPath(
-                              searchTv.backdrop_path || "",
+                              searchTv.poster_path || "",
                               "w500"
                             )}
                           >
@@ -682,7 +682,7 @@ export default function Search() {
                             transition={{ type: "tween" }}
                             variants={boxVariants}
                             bgphoto={makeImgPath(
-                              searchTv.backdrop_path || "",
+                              searchTv.poster_path || "",
                               "w500"
                             )}
                           >
@@ -720,7 +720,7 @@ export default function Search() {
                         exit="exit"
                         onClick={onOverlayClick}
                       />
-                      <BigMovie layoutId={moviePathMatch.params.movieId}>
+                      <BigMovie layoutId={moviePathMatch.params.searchId}>
                         <DetailMovie>
                           <IsAdult>
                             <div style={{ marginLeft: "10px" }}>
@@ -741,7 +741,7 @@ export default function Search() {
                           <div
                             style={{
                               backgroundImage: `url(${makeImgPath(
-                                "/" + moviePathMatch.params.posterPath!
+                                "/" + moviePathMatch.params.urlPath!
                               )})`,
                               backgroundSize: `contain`,
                               backgroundRepeat: `no-repeat`,
@@ -772,7 +772,7 @@ export default function Search() {
                               <div>
                                 <span>
                                   출시일: &nbsp;
-                                  {moviePathMatch.params.releaseDate}
+                                  {moviePathMatch.params.Date}
                                 </span>
                               </div>
                               <div>

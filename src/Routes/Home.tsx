@@ -16,6 +16,7 @@ import { useLayoutEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useMatch, PathMatch } from "react-router-dom";
+import { FaChessQueen, FaHeart, FaStar } from "react-icons/fa";
 
 const Wrapper = styled.div`
   background-color: black;
@@ -195,7 +196,7 @@ const IsAdult = styled(motion.div)`
   display: flex;
   width: 100%;
   height: 100%;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding-right: 20px;
 `;
@@ -302,7 +303,18 @@ const overlayVariants = {
 };
 
 const offset = 6;
-
+const rating = (score: number) => {
+  const result = [];
+  for (let i = 5; i > 0; i--) {
+    score--;
+    if (score >= 0) {
+      result.push(<FaStar size="12" color="#d57358"></FaStar>);
+    } else {
+      result.push(<FaStar size="12" color="lightgray"></FaStar>);
+    }
+  }
+  return result;
+};
 export default function Home() {
   const navigate = useNavigate();
   const moviePathMatch: PathMatch<string> | null = useMatch(
@@ -376,8 +388,12 @@ export default function Home() {
     backdrop_path = backdrop_path.replace("/", "");
     release_date = release_date.replace("/", "");
     popularity = Math.round(popularity);
-    vote_average = Math.round(vote_average);
+    vote_average = Math.floor(Math.round(vote_average) / 2);
     vote_count = Math.round(vote_count);
+
+    if (vote_average >= 5) {
+      vote_average = 5;
+    }
 
     navigate(
       `/movie/latest/${movieId}/${dummyDataMsgMake(
@@ -751,6 +767,7 @@ export default function Home() {
                     </UpcommingRow>
                   </AnimatePresence>
                 </UpcommingSlider>
+
                 <AnimatePresence>
                   {moviePathMatch ? (
                     <>
@@ -761,9 +778,14 @@ export default function Home() {
                         exit="exit"
                         onClick={onOverlayClick}
                       />
-                      <BigMovie layoutId={moviePathMatch.params.id}>
+                      <BigMovie layoutId={moviePathMatch.params.movieId}>
                         <DetailMovie>
                           <IsAdult>
+                            <div style={{ marginLeft: "10px" }}>
+                              {rating(
+                                Number(moviePathMatch.params.vote_average)
+                              )}
+                            </div>
                             <IsAdultDetail
                               isadult={Boolean(moviePathMatch.params.adult)}
                             >
@@ -791,6 +813,36 @@ export default function Home() {
                                   "error - 1"
                               )}
                             </DetailMovieTitle>
+                            <div
+                              style={{
+                                display: "flex",
+                                width: "100%",
+                                justifyContent: "space-between",
+                                alignContent: "center",
+                                padding: "20px",
+                              }}
+                            >
+                              <div>
+                                <span>
+                                  출시일: &nbsp;
+                                  {moviePathMatch.params.release_date}
+                                </span>
+                              </div>
+                              <div>
+                                <FaChessQueen /> &nbsp;
+                                <span>{moviePathMatch.params.popularity}</span>
+                              </div>
+                              <div>
+                                <FaHeart style={{ color: "tomato" }} />
+                                &nbsp;
+                                <span>{moviePathMatch.params.vote_count}</span>
+                              </div>
+                            </div>
+                            <div>
+                              {decodeURIComponent(
+                                moviePathMatch.params.overview || "error - 2"
+                              )}
+                            </div>
                           </DetailMovieBottom>
                         </DetailMovie>
                       </BigMovie>

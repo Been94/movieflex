@@ -6,6 +6,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMatch, PathMatch } from "react-router-dom";
+import { FaChessQueen, FaHeart, FaStar } from "react-icons/fa";
 
 const Wrapper = styled.div`
   background-color: rgba(0, 0, 0, 0.8);
@@ -159,7 +160,7 @@ const IsAdult = styled(motion.div)`
   display: flex;
   width: 100%;
   height: 100%;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding-right: 20px;
 `;
@@ -252,7 +253,18 @@ const overlayVariants = {
   visible: { opacity: 0.7 },
   exit: { opacity: 0 },
 };
-
+const rating = (score: number) => {
+  const result = [];
+  for (let i = 5; i > 0; i--) {
+    score--;
+    if (score >= 0) {
+      result.push(<FaStar size="12" color="#d57358"></FaStar>);
+    } else {
+      result.push(<FaStar size="12" color="lightgray"></FaStar>);
+    }
+  }
+  return result;
+};
 export default function Search() {
   const navigate = useNavigate();
   const moviePathMatch: PathMatch<string> | null = useMatch(
@@ -314,6 +326,10 @@ export default function Search() {
     voteCount?: number,
     posterPath?: string
   ) => {
+    if (voteAverage! >= 5) {
+      voteAverage = 5;
+    }
+
     navigate(
       `/search/latest/${searchId}/${title}/${releaseDate}/${language}/${popularity}/${voteAverage}/${voteCount}/${posterPath?.replace(
         "/",
@@ -456,7 +472,7 @@ export default function Search() {
                               onBoxClicked(
                                 tv.id,
                                 tv.adult,
-                                tv.title,
+                                tv.original_name,
                                 tv.original_language,
                                 tv.popularity,
                                 tv.release_date,
@@ -541,7 +557,7 @@ export default function Search() {
                               onBoxClicked(
                                 tv.id,
                                 tv.adult,
-                                tv.title,
+                                tv.original_name,
                                 tv.original_language,
                                 tv.popularity,
                                 tv.release_date,
@@ -561,7 +577,7 @@ export default function Search() {
                           >
                             <img />
                             <Info variants={infoVariants}>
-                              <h4>{tv.original_title}</h4>
+                              <h4>{tv.original_name}</h4>
                             </Info>
                           </Box>
                         ))}
@@ -593,9 +609,14 @@ export default function Search() {
                         exit="exit"
                         onClick={onOverlayClick}
                       />
-                      <BigMovie layoutId={moviePathMatch.params.id}>
+                      <BigMovie layoutId={moviePathMatch.params.movieId}>
                         <DetailMovie>
                           <IsAdult>
+                            <div style={{ marginLeft: "10px" }}>
+                              {rating(
+                                Number(moviePathMatch.params.vote_average)
+                              )}
+                            </div>
                             <IsAdultDetail
                               isadult={Boolean(moviePathMatch.params.adult)}
                             >
@@ -618,10 +639,56 @@ export default function Search() {
                           />
                           <DetailMovieBottom>
                             <DetailMovieTitle>
-                              {decodeURIComponent(
-                                moviePathMatch.params.title || "error - 1"
+                              {moviePathMatch.params.title === undefined ? (
+                                <span>unknown</span>
+                              ) : (
+                                <>
+                                  {decodeURIComponent(
+                                    moviePathMatch.params.title || "error - 1"
+                                  )}
+                                </>
                               )}
                             </DetailMovieTitle>
+                            <div
+                              style={{
+                                display: "flex",
+                                width: "100%",
+                                justifyContent: "space-between",
+                                alignContent: "center",
+                                padding: "20px",
+                              }}
+                            >
+                              <div>
+                                <span>
+                                  출시일: &nbsp;
+                                  {moviePathMatch.params.releaseDate}
+                                </span>
+                              </div>
+                              <div>
+                                <FaChessQueen /> &nbsp;
+                                <span>{moviePathMatch.params.popularity}</span>
+                              </div>
+                              <div>
+                                {moviePathMatch.params.vote_count === "0" ? (
+                                  <>
+                                    <div />
+                                  </>
+                                ) : (
+                                  <>
+                                    <FaHeart style={{ color: "tomato" }} />
+                                    &nbsp;
+                                    <span>
+                                      {moviePathMatch.params.vote_count}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            <div>
+                              {decodeURIComponent(
+                                moviePathMatch.params.overview || ""
+                              )}
+                            </div>
                           </DetailMovieBottom>
                         </DetailMovie>
                       </BigMovie>

@@ -8,7 +8,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMatch, PathMatch } from "react-router-dom";
 
 const Wrapper = styled.div`
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.8);
   height: 40vh;
 `;
 
@@ -136,6 +136,7 @@ const Overlay = styled(motion.div)`
 const BigMovie = styled(motion.div)`
   position: fixed;
   background-color: rgba(0, 0, 0, 0.9);
+  border: 1px solid white;
   border-radius: 10px;
   width: 60vw;
   height: 70vh;

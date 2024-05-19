@@ -78,6 +78,145 @@ export interface IUpcomingResult {
   total_pages: number;
   total_results: number;
 }
+
+export interface ITvLatest {
+  adult: boolean;
+  backdrop_path: string;
+  id: number;
+  origin_country: [];
+  original_language: string;
+  original_name: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  first_air_date: string;
+  name: string;
+  vote_average: number;
+  vote_count: number;
+}
+
+export interface ITvLatestResult {
+  page: number;
+  results: ITvLatest[];
+  total_pages: number;
+  total_results: number;
+}
+
+export interface ITvAiringToday {
+  adult: Boolean;
+  backdrop_path: string;
+  id: number;
+  origin_country: [];
+  original_language: string;
+  original_name: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  first_air_date: string;
+  name: string;
+  vote_average: number;
+  vote_count: number;
+}
+
+export interface ITvAiringTodayResult {
+  page: number;
+  results: ITvAiringToday[];
+  total_pages: number;
+  total_results: number;
+}
+
+export interface ITvPopular {
+  adult: boolean;
+  backdrop_path: string;
+  id: number;
+  origin_country: [];
+  original_language: string;
+  original_name: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  first_air_date: string;
+  name: string;
+  vote_average: number;
+  vote_count: number;
+}
+
+export interface ITvPopularResult {
+  page: number;
+  results: ITvPopular[];
+  total_pages: number;
+  total_results: number;
+}
+
+export interface ITvTopRated {
+  adult: boolean;
+  backdrop_path: string;
+  id: number;
+  origin_country: [];
+  original_language: string;
+  original_name: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  first_air_date: string;
+  name: string;
+  vote_average: number;
+  vote_count: number;
+}
+
+export interface ITvTopRatedResult {
+  page: number;
+  results: ITvTopRated[];
+  total_pages: number;
+  total_results: number;
+}
+
+export interface ISearchMovie {
+  adult: boolean;
+  backdrop_path: string;
+  id: number;
+  original_language: string;
+  original_title: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  release_date: string;
+  title: string;
+  video: boolean;
+  vote_average: number;
+  vote_count: number;
+}
+
+export interface ISearchMovieResult {
+  page: number;
+  results: ISearchMovie[];
+  total_pages: number;
+  total_results: number;
+}
+
+export interface ISearchTv {
+  adult: boolean;
+  backdrop_path: string;
+  id: number;
+  origin_country: [];
+  original_language: string;
+  original_name: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  first_air_date: string;
+  name: string;
+  vote_average: number;
+  vote_count: number;
+}
+
+export interface ISearchTvResult {
+  page: number;
+  results: ISearchTv[];
+  total_pages: number;
+  total_results: number;
+}
+
 const options = {
   method: "GET",
   headers: {

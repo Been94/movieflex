@@ -7,7 +7,7 @@ import {
 import styled from "styled-components";
 import { Status, bgArrayRandom, makeImgPath } from "./Util";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useMatch, PathMatch } from "react-router-dom";

@@ -381,12 +381,45 @@ export default function Home() {
     original_language: string,
     release_date: string
   ) => {
-    original_title = original_title.replace("/", "");
-    original_language = original_language.replace("/", "");
-    overview = overview.replace("/", "");
-    poster_path = poster_path.replace("/", "");
-    backdrop_path = backdrop_path.replace("/", "");
-    release_date = release_date.replace("/", "");
+    if (original_title != undefined) {
+      original_title = original_title.replace("/", "");
+      original_title = original_title.replace(":", "");
+    }
+    if (original_language != undefined) {
+      original_language = original_language.replace("/", "");
+      original_language = original_language.replace(":", "");
+    }
+    if (overview != undefined) {
+      overview = overview.replace("/", "");
+      overview = overview.replace(":", "");
+    }
+    if (poster_path != undefined) {
+      poster_path = poster_path.replace("/", "");
+      poster_path = poster_path.replace(":", "");
+    }
+    if (backdrop_path != undefined) {
+      backdrop_path = backdrop_path.replace("/", "");
+      backdrop_path = backdrop_path.replace(":", "");
+    }
+    if (release_date != undefined) {
+      release_date = release_date.replace("/", "");
+      release_date = release_date.replace(":", "");
+    }
+
+    console.log("movieId", movieId);
+    console.log("popularity", popularity);
+    console.log("vote_average", vote_average);
+    console.log("vote_count", vote_count);
+
+    console.log("adult", adult);
+    console.log("backdrop_path", backdrop_path);
+    console.log("poster_path", poster_path);
+
+    console.log("overview", overview);
+    console.log("original_title", original_title);
+    console.log("original_language", original_language);
+    console.log("release_date", release_date);
+
     popularity = Math.round(popularity);
     vote_average = Math.floor(Math.round(vote_average) / 2);
     vote_count = Math.round(vote_count);
@@ -394,6 +427,13 @@ export default function Home() {
     if (vote_average >= 5) {
       vote_average = 5;
     }
+
+    if (overview.length >= 400) {
+      overview = overview.substring(0, 400);
+      overview = overview + "...";
+    }
+
+    console.log(overview.length);
 
     navigate(
       `/movie/latest/${movieId}/${dummyDataMsgMake(

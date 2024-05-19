@@ -456,6 +456,11 @@ export default function Tv() {
       vote_average = 5;
     }
 
+    if (overview.length >= 400) {
+      overview = overview.substring(0, 400);
+      overview = overview + "...";
+    }
+
     // console.log("adult", adult);
     // console.log("id", id);
     // console.log("popularity", popularity);

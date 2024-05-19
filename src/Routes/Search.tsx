@@ -423,6 +423,11 @@ export default function Search() {
       tmpPath = undefined;
     }
 
+    if (overview.length >= 400) {
+      overview = overview.substring(0, 400);
+      overview = overview + "...";
+    }
+
     navigate(
       `/search/latest/${searchId}/${dummyDataMsgMake(
         tmpName!,

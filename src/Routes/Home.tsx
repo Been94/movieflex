@@ -5,7 +5,7 @@ import {
   getMoviesUpcoming,
 } from "../api";
 import styled from "styled-components";
-import { bgArrayRandom, makeImgPath } from "./Util";
+import { Status, bgArrayRandom, makeImgPath } from "./Util";
 import { useQuery } from "@tanstack/react-query";
 import { useLayoutEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,6 +14,7 @@ import { useMatch, PathMatch } from "react-router-dom";
 
 const Wrapper = styled.div`
   background-color: black;
+  height: 50vh;
 `;
 
 const Loader = styled.div`
@@ -43,19 +44,43 @@ const Overview = styled.p`
 
 const LatestSlider = styled.div`
   position: relative;
-  top: -100px;
 `;
 
 const TopRatedSlider = styled.div`
   position: relative;
-  top: -200px;
 `;
 
-const Row = styled(motion.div)`
+const UpcommingSlider = styled.div`
+  position: relative;
+`;
+
+const LatestRow = styled(motion.div)`
   display: grid;
   gap: 5px;
   grid-template-columns: repeat(6, 1fr);
   position: absolute;
+  bottom: 30px;
+  width: 100%;
+`;
+
+const TopRatedRow = styled(motion.div)`
+  display: grid;
+  gap: 5px;
+  grid-template-columns: repeat(6, 1fr);
+  width: 100%;
+  position: absolute;
+  top: 5px;
+`;
+
+const UpcommingRow = styled(motion.div)`
+  display: grid;
+  gap: 5px;
+  grid-template-columns: repeat(6, 1fr);
+  position: absolute;
+  top: 250px;
+
+  //position: absolute;
+
   width: 100%;
 `;
 
@@ -93,6 +118,12 @@ const RightBtn = styled(motion.div)`
     justify-content: center;
     align-items: center;
   }
+`;
+const Box2 = styled(motion.div)`
+  background-color: white;
+  height: 200px;
+  color: red;
+  font-size: 66px;
 `;
 
 const Box = styled(motion.div)<{ bgphoto: string }>`
@@ -196,7 +227,31 @@ const SliderBackground = styled.div`
   height: 100%;
 `;
 
-const rowVariants = {
+const latestRowVariants = {
+  hidden: {
+    x: window.outerWidth,
+  },
+  visible: {
+    x: 0,
+  },
+  exit: {
+    x: -window.outerWidth,
+  },
+};
+
+const TopRatedRowVariants = {
+  hidden: {
+    x: window.outerWidth,
+  },
+  visible: {
+    x: 0,
+  },
+  exit: {
+    x: -window.outerWidth,
+  },
+};
+
+const UpcommingRowVariants = {
   hidden: {
     x: window.outerWidth,
   },
@@ -251,9 +306,14 @@ export default function Home() {
   console.log(moviePathMatch);
 
   const [randomNumber, setRandomNumber] = useState(0);
-  const [index, setIndex] = useState(0);
+  const [latestIndex, setLatestIndex] = useState(0);
+  const [topRatedIndex, setTopRatedIndex] = useState(0);
+  const [upCommingIndex, setUpCommingIndex] = useState(0);
+
   const [maxIndex, setMaxIndex] = useState(0);
-  const [leaving, setLeaving] = useState(false);
+  const [latestLeaving, setLatestLeaving] = useState(false);
+  const [topRatedLeaving, setTopRatedLeaving] = useState(false);
+  const [upCommingLeaving, setUpCommingLeaving] = useState(false);
 
   const useGetMovieQuerys = () => {
     const latest = useQuery<IGetMoviesResult>({
@@ -295,7 +355,10 @@ export default function Home() {
     bgArrayRandomFunction();
   }, []);
 
-  const toggleLeving = () => setLeaving((current) => !current);
+  const latestToggleLeving = () => setLatestLeaving((current) => !current);
+  const topRatedToggleLeving = () => setTopRatedLeaving((current) => !current);
+  const upCommingLeavingToggleLeving = () =>
+    setUpCommingLeaving((current) => !current);
 
   const onBoxClicked = (
     movieId: number,
@@ -316,41 +379,86 @@ export default function Home() {
     );
   };
 
-  const leftIndex = () => {
-    if (latestData) {
-      if (leaving) {
+  const leftIndex = (index: number, value: string, data: any) => {
+    if (data) {
+      if (value === Status.latest) {
+        latestToggleLeving();
+      }
+
+      if (value === Status.topRated) {
+        topRatedToggleLeving();
+      }
+
+      if (value === Status.upComming) {
+        upCommingLeavingToggleLeving();
+      }
+
+      const totalMovies = data.results.length;
+      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      setMaxIndex(maxIndex);
+      if (index === 0) {
         return;
-      } else {
-        toggleLeving();
-        const totalMovies = latestData.results.length;
-        const maxIndex = Math.floor(totalMovies / offset) - 1;
-        setMaxIndex(maxIndex);
-        if (index === 0) {
-          return;
-        } else if (index > 0) {
-          return setIndex((current) => current - 1);
-        } else if (index === maxIndex) {
-          return setIndex(0);
+      } else if (index > 0) {
+        if (value === Status.latest) {
+          return setLatestIndex((current) => current - 1);
+        }
+        if (value === Status.topRated) {
+          return setTopRatedIndex((current) => current - 1);
+        }
+        if (value === Status.upComming) {
+          return setUpCommingIndex((current) => current - 1);
+        }
+      } else if (index === maxIndex) {
+        if (value === Status.latest) {
+          return setLatestIndex(0);
+        }
+        if (value === Status.topRated) {
+          return setTopRatedIndex(0);
+        }
+        if (value === Status.upComming) {
+          return setUpCommingIndex(0);
         }
       }
     }
   };
 
-  const rightIndex = () => {
-    if (latestData) {
-      if (leaving) {
-        return;
-      } else {
-        toggleLeving();
-        const totalMovies = latestData.results.length;
-        const maxIndex = Math.floor(totalMovies / offset) - 1;
-        setMaxIndex(maxIndex);
-        console.log(maxIndex);
+  const rightIndex = (index: number, value: string, data: any) => {
+    if (data) {
+      if (value === Status.latest) {
+        latestToggleLeving();
+      }
 
-        if (index >= 0) {
-          return setIndex((current) => current + 1);
-        } else if (index === maxIndex) {
-          return setIndex(0);
+      if (value === Status.topRated) {
+        topRatedToggleLeving();
+      }
+
+      if (value === Status.upComming) {
+        upCommingLeavingToggleLeving();
+      }
+      const totalMovies = data.results.length;
+      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      setMaxIndex(maxIndex);
+      console.log(maxIndex);
+
+      if (index >= 0) {
+        if (value === Status.latest) {
+          return setLatestIndex((current) => current + 1);
+        }
+        if (value === Status.topRated) {
+          return setTopRatedIndex((current) => current + 1);
+        }
+        if (value === Status.upComming) {
+          return setUpCommingIndex((current) => current + 1);
+        }
+      } else if (index === maxIndex) {
+        if (value === Status.latest) {
+          return setLatestIndex(0);
+        }
+        if (value === Status.topRated) {
+          return setTopRatedIndex(0);
+        }
+        if (value === Status.upComming) {
+          return setUpCommingIndex(0);
         }
       }
     }
@@ -384,109 +492,169 @@ export default function Home() {
                 {latestData?.results[randomNumber || 19].overview}
               </Overview>
             </Banner>
-            <LatestSlider>
-              <AnimatePresence initial={false} onExitComplete={toggleLeving}>
-                <NowPlaying>
-                  <span>Latest movies</span>
-                </NowPlaying>
-                <Row
-                  variants={rowVariants}
-                  initial={index > 0 ? "hidden" : "exit"}
-                  animate="visible"
-                  exit={index < maxIndex ? "exit" : "hidden"}
-                  transition={{ type: "tween", duration: 1 }}
-                  key={index}
-                >
-                  {index > 0 ? (
-                    <LeftBtn onClick={leftIndex}>
-                      <span>{"<"}</span>
-                    </LeftBtn>
-                  ) : null}
 
-                  {latestData?.results
-                    .slice(offset * index, offset * index + offset)
-                    .map((movie) => (
-                      <Box
-                        layoutId={String(movie.id + 1)}
-                        key={movie.id}
-                        onClick={() =>
-                          onBoxClicked(
-                            movie.id,
-                            movie.adult,
-                            movie.title,
-                            movie.original_language,
-                            movie.popularity,
-                            movie.release_date,
-                            movie.vote_average,
-                            movie.vote_count,
-                            movie.poster_path
-                          )
-                        }
-                        initial="normal"
-                        whileHover="hover"
-                        transition={{ type: "tween" }}
-                        variants={boxVariants}
-                        bgphoto={makeImgPath(movie.backdrop_path || "", "w500")}
-                      >
-                        <img />
-                        <Info variants={infoVariants}>
-                          <h4>{movie.title}</h4>
-                        </Info>
-                      </Box>
-                    ))}
-                  {index === maxIndex ? null : (
-                    <RightBtn onClick={rightIndex}>
-                      <span>{">"}</span>
-                    </RightBtn>
-                  )}
-                </Row>
-              </AnimatePresence>
-            </LatestSlider>
-            <AnimatePresence>
-              {moviePathMatch ? (
-                <>
-                  <Overlay
-                    variants={overlayVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    onClick={onOverlayClick}
-                  />
-                  <BigMovie layoutId={moviePathMatch.params.id}>
-                    <DetailMovie>
-                      <IsAdult>
-                        <IsAdultDetail
-                          isadult={Boolean(moviePathMatch.params.adult)}
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "100%",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  width: "100%",
+                  top: 100,
+                  paddingBottom: "20px",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <LatestSlider>
+                  <AnimatePresence
+                    initial={false}
+                    onExitComplete={latestToggleLeving}
+                  >
+                    <span style={{ position: "absolute", top: "-260px" }}>
+                      LatestMovie
+                    </span>
+                    <LatestRow
+                      variants={latestRowVariants}
+                      initial={latestIndex > 0 ? "hidden" : "exit"}
+                      animate="visible"
+                      exit={latestIndex < maxIndex ? "exit" : "hidden"}
+                      transition={{ type: "tween", duration: 1 }}
+                      key={latestIndex}
+                    >
+                      {latestIndex > 0 ? (
+                        <LeftBtn
+                          onClick={() =>
+                            leftIndex(latestIndex, Status.latest, latestData)
+                          }
                         >
-                          {Boolean(moviePathMatch.params.adult) ? (
-                            <span>No Adult</span>
-                          ) : (
-                            <span>Adult</span>
-                          )}
-                        </IsAdultDetail>
-                      </IsAdult>
-                      <div
-                        style={{
-                          backgroundImage: `url(${makeImgPath(
-                            "/" + moviePathMatch.params.posterPath!
-                          )})`,
-                          backgroundSize: `contain`,
-                          backgroundRepeat: `no-repeat`,
-                          backgroundPosition: "center",
-                        }}
-                      />
-                      <DetailMovieBottom>
-                        <DetailMovieTitle>
-                          {decodeURIComponent(
-                            moviePathMatch.params.title || "error - 1"
-                          )}
-                        </DetailMovieTitle>
-                      </DetailMovieBottom>
-                    </DetailMovie>
-                  </BigMovie>
-                </>
-              ) : null}
-            </AnimatePresence>
+                          <span>{"<"}</span>
+                        </LeftBtn>
+                      ) : null}
+
+                      {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <Box2 key={i}>{i}</Box2>
+                      ))}
+
+                      {latestIndex === maxIndex ? null : (
+                        <RightBtn
+                          onClick={() =>
+                            rightIndex(latestIndex, Status.latest, latestData)
+                          }
+                        >
+                          <span>{">"}</span>
+                        </RightBtn>
+                      )}
+                    </LatestRow>
+                  </AnimatePresence>
+                </LatestSlider>
+
+                <TopRatedSlider>
+                  <AnimatePresence
+                    initial={false}
+                    onExitComplete={topRatedToggleLeving}
+                  >
+                    <span style={{ position: "absolute", bottom: "5px" }}>
+                      TopRateMovie
+                    </span>
+                    <TopRatedRow
+                      variants={TopRatedRowVariants}
+                      initial={topRatedIndex > 0 ? "hidden" : "exit"}
+                      animate="visible"
+                      exit={topRatedIndex < maxIndex ? "exit" : "hidden"}
+                      transition={{ type: "tween", duration: 1 }}
+                      key={topRatedIndex}
+                    >
+                      {topRatedIndex > 0 ? (
+                        <LeftBtn
+                          onClick={() =>
+                            leftIndex(
+                              topRatedIndex,
+                              Status.topRated,
+                              latestData
+                            )
+                          }
+                        >
+                          <span>{"<"}</span>
+                        </LeftBtn>
+                      ) : null}
+                      {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <Box2 key={i}>{i}</Box2>
+                      ))}
+
+                      {topRatedIndex === maxIndex ? null : (
+                        <RightBtn
+                          onClick={() =>
+                            rightIndex(
+                              topRatedIndex,
+                              Status.topRated,
+                              latestData
+                            )
+                          }
+                        >
+                          <span>{">"}</span>
+                        </RightBtn>
+                      )}
+                    </TopRatedRow>
+                  </AnimatePresence>
+                </TopRatedSlider>
+
+                <UpcommingSlider>
+                  <AnimatePresence
+                    initial={false}
+                    onExitComplete={upCommingLeavingToggleLeving}
+                  >
+                    <span style={{ position: "absolute", bottom: "-250px" }}>
+                      Upcomming
+                    </span>
+
+                    <UpcommingRow
+                      variants={UpcommingRowVariants}
+                      initial={upCommingIndex > 0 ? "hidden" : "exit"}
+                      animate="visible"
+                      exit={upCommingIndex < maxIndex ? "exit" : "hidden"}
+                      transition={{ type: "tween", duration: 1 }}
+                      key={upCommingIndex}
+                    >
+                      {upCommingIndex > 0 ? (
+                        <LeftBtn
+                          onClick={() =>
+                            leftIndex(
+                              upCommingIndex,
+                              Status.upComming,
+                              latestData
+                            )
+                          }
+                        >
+                          <span>{"<"}</span>
+                        </LeftBtn>
+                      ) : null}
+                      {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <Box2 key={i}>{i}</Box2>
+                      ))}
+
+                      {upCommingIndex === maxIndex ? null : (
+                        <RightBtn
+                          onClick={() =>
+                            rightIndex(
+                              upCommingIndex,
+                              Status.upComming,
+                              latestData
+                            )
+                          }
+                        >
+                          <span>{">"}</span>
+                        </RightBtn>
+                      )}
+                    </UpcommingRow>
+                  </AnimatePresence>
+                </UpcommingSlider>
+              </div>
+            </div>
           </>
         )}
       </Wrapper>

@@ -5,3 +5,9 @@ export function makeImgPath(id: string, format?: string) {
 export async function bgArrayRandom(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+export enum Status {
+  latest = "latest",
+  topRated = "topRated",
+  upComming = "upComming",
+}

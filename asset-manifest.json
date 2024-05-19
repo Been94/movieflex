@@ -1,0 +1,12 @@
+{
+  "files": {
+    "main.css": "/movieflex/static/css/main.31d6cfe0.css",
+    "main.js": "/movieflex/static/js/main.c0f46f42.js",
+    "index.html": "/movieflex/index.html",
+    "main.c0f46f42.js.map": "/movieflex/static/js/main.c0f46f42.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.31d6cfe0.css",
+    "static/js/main.c0f46f42.js"
+  ]
+}

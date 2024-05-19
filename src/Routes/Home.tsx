@@ -356,11 +356,6 @@ export default function Home() {
     bgArrayRandomFunction();
   }, []);
 
-  const latestToggleLeving = () => setLatestLeaving((current) => !current);
-  const topRatedToggleLeving = () => setTopRatedLeaving((current) => !current);
-  const upCommingLeavingToggleLeving = () =>
-    setUpCommingLeaving((current) => !current);
-
   const onBoxClicked = (
     movieId: number,
     adult: boolean,
@@ -382,18 +377,6 @@ export default function Home() {
 
   const leftIndex = (index: number, value: string, data: any) => {
     if (data) {
-      if (value === movieStatus.latest) {
-        latestToggleLeving();
-      }
-
-      if (value === movieStatus.topRated) {
-        topRatedToggleLeving();
-      }
-
-      if (value === movieStatus.upComming) {
-        upCommingLeavingToggleLeving();
-      }
-
       const totalMovies = data.results.length;
       const maxIndex = Math.floor(totalMovies / offset) - 1;
       setMaxIndex(maxIndex);
@@ -425,17 +408,6 @@ export default function Home() {
 
   const rightIndex = (index: number, value: string, data: any) => {
     if (data) {
-      if (value === movieStatus.latest) {
-        latestToggleLeving();
-      }
-
-      if (value === movieStatus.topRated) {
-        topRatedToggleLeving();
-      }
-
-      if (value === movieStatus.upComming) {
-        upCommingLeavingToggleLeving();
-      }
       const totalMovies = data.results.length;
       const maxIndex = Math.floor(totalMovies / offset) - 1;
       setMaxIndex(maxIndex);
@@ -464,13 +436,6 @@ export default function Home() {
       }
     }
   };
-
-  // const { data, isLoading } = useQuery<IGetMoviesResult>({
-  //   queryKey: ["movies", "latest"],
-  //   queryFn: getMovies,
-  // });
-
-  //console.log(randomNumber);
 
   return (
     <>
@@ -512,10 +477,7 @@ export default function Home() {
                 }}
               >
                 <LatestSlider>
-                  <AnimatePresence
-                    initial={false}
-                    onExitComplete={latestToggleLeving}
-                  >
+                  <AnimatePresence initial={false}>
                     <span style={{ position: "absolute", top: "-260px" }}>
                       LatestMovie
                     </span>
@@ -597,10 +559,7 @@ export default function Home() {
                 </LatestSlider>
 
                 <TopRatedSlider>
-                  <AnimatePresence
-                    initial={false}
-                    onExitComplete={topRatedToggleLeving}
-                  >
+                  <AnimatePresence initial={false}>
                     <span style={{ position: "absolute", bottom: "5px" }}>
                       TopRateMovie
                     </span>
@@ -682,10 +641,7 @@ export default function Home() {
                 </TopRatedSlider>
 
                 <UpcommingSlider>
-                  <AnimatePresence
-                    initial={false}
-                    onExitComplete={upCommingLeavingToggleLeving}
-                  >
+                  <AnimatePresence initial={false}>
                     <span style={{ position: "absolute", bottom: "-250px" }}>
                       Upcomming
                     </span>

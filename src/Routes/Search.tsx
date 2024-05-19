@@ -255,7 +255,7 @@ const overlayVariants = {
 export default function Search() {
   const navigate = useNavigate();
   const moviePathMatch: PathMatch<string> | null = useMatch(
-    "/movie/latest/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
+    "/search/latest/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
   );
   console.log(moviePathMatch);
 
@@ -303,10 +303,10 @@ export default function Search() {
   const onOverlayClick = () => navigate(-1);
 
   const onBoxClicked = (
-    movieId: number,
-    adult: boolean,
-    title: string,
-    language: string,
+    searchId?: number,
+    adult?: boolean,
+    title?: string,
+    language?: string,
     popularity?: number,
     releaseDate?: string,
     voteAverage?: number,
@@ -314,7 +314,7 @@ export default function Search() {
     posterPath?: string
   ) => {
     navigate(
-      `/latest/movie/${movieId}/${title}/${releaseDate}/${language}/${popularity}/${voteAverage}/${voteCount}/${posterPath?.replace(
+      `/search/latest/${searchId}/${title}/${releaseDate}/${language}/${popularity}/${voteAverage}/${voteCount}/${posterPath?.replace(
         "/",
         ""
       )}/${adult}`
@@ -451,17 +451,19 @@ export default function Search() {
                           <Box
                             layoutId={String(tv.id)}
                             key={tv.id}
-                            // onClick={() =>
-                            //   onBoxClicked(
-                            //     tv.id,
-                            //     tv.adult,
-                            //     tv.original_language,
-                            //     tv.popularity,
-                            //     tv.vote_average,
-                            //     tv.vote_count,
-                            //     tv.poster_path
-                            //   )
-                            // }
+                            onClick={() =>
+                              onBoxClicked(
+                                tv.id,
+                                tv.adult,
+                                tv.title,
+                                tv.original_language,
+                                tv.popularity,
+                                tv.release_date,
+                                tv.vote_average,
+                                tv.vote_count,
+                                tv.poster_path
+                              )
+                            }
                             initial="normal"
                             whileHover="hover"
                             transition={{ type: "tween" }}
@@ -534,19 +536,19 @@ export default function Search() {
                           <Box
                             layoutId={String(tv.id)}
                             key={tv.id}
-                            // onClick={() =>
-                            //   onBoxClicked(
-                            //     movie.id,
-                            //     movie.adult,
-                            //     movie.title,
-                            //     movie.original_language,
-                            //     movie.popularity,
-                            //     movie.release_date,
-                            //     movie.vote_average,
-                            //     movie.vote_count,
-                            //     movie.poster_path
-                            //   )
-                            // }
+                            onClick={() =>
+                              onBoxClicked(
+                                tv.id,
+                                tv.adult,
+                                tv.title,
+                                tv.original_language,
+                                tv.popularity,
+                                tv.release_date,
+                                tv.vote_average,
+                                tv.vote_count,
+                                tv.poster_path
+                              )
+                            }
                             initial="normal"
                             whileHover="hover"
                             transition={{ type: "tween" }}

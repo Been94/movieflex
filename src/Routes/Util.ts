@@ -17,3 +17,8 @@ export enum tvStatus {
   popular = "popular",
   rated = "rated",
 }
+
+export enum searchStatus {
+  searchTv = "searchTv",
+  searchMovie = "searchMovie",
+}

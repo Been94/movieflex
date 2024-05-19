@@ -1,14 +1,8 @@
-import {
-  IGetMoviesResult,
-  getMovies,
-  getMoviesTopRated,
-  getMoviesUpcoming,
-  getSearchMovie,
-} from "../api";
+import { ISearchResult, getSearchMovie, getSearchTv } from "../api";
 import styled from "styled-components";
-import { movieStatus, bgArrayRandom, makeImgPath } from "./Util";
+import { makeImgPath, searchStatus } from "./Util";
 import { useQuery } from "@tanstack/react-query";
-import { useLayoutEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMatch, PathMatch } from "react-router-dom";
@@ -22,17 +16,6 @@ const Loader = styled.div`
   height: 20vh;
 `;
 
-const Banner = styled.div<{ bgphoto: string }>`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 60px;
-  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
-    url(${(props) => props.bgphoto});
-  background-size: cover;
-`;
-
 const Title = styled.h2`
   font-size: 68px;
   margin-bottom: 20px;
@@ -43,19 +26,15 @@ const Overview = styled.p`
   width: 50%;
 `;
 
-const LatestSlider = styled.div`
+const SearchTvSlider = styled.div`
   position: relative;
 `;
 
-const TopRatedSlider = styled.div`
+const SearchMovieSlider = styled.div`
   position: relative;
 `;
 
-const UpcommingSlider = styled.div`
-  position: relative;
-`;
-
-const LatestRow = styled(motion.div)`
+const SearchTvRow = styled(motion.div)`
   display: grid;
   gap: 5px;
   grid-template-columns: repeat(6, 1fr);
@@ -64,25 +43,13 @@ const LatestRow = styled(motion.div)`
   width: 100%;
 `;
 
-const TopRatedRow = styled(motion.div)`
+const SearchMovieRow = styled(motion.div)`
   display: grid;
   gap: 5px;
   grid-template-columns: repeat(6, 1fr);
   width: 100%;
   position: absolute;
   top: 5px;
-`;
-
-const UpcommingRow = styled(motion.div)`
-  display: grid;
-  gap: 5px;
-  grid-template-columns: repeat(6, 1fr);
-  position: absolute;
-  top: 250px;
-
-  //position: absolute;
-
-  width: 100%;
 `;
 
 const LeftBtn = styled(motion.div)`
@@ -228,7 +195,7 @@ const SliderBackground = styled.div`
   height: 100%;
 `;
 
-const latestRowVariants = {
+const SearchTvRowVariants = {
   hidden: {
     x: window.outerWidth,
   },
@@ -240,19 +207,7 @@ const latestRowVariants = {
   },
 };
 
-const TopRatedRowVariants = {
-  hidden: {
-    x: window.outerWidth,
-  },
-  visible: {
-    x: 0,
-  },
-  exit: {
-    x: -window.outerWidth,
-  },
-};
-
-const UpcommingRowVariants = {
+const SearchMovieRowVariants = {
   hidden: {
     x: window.outerWidth,
   },
@@ -297,8 +252,6 @@ const overlayVariants = {
   exit: { opacity: 0 },
 };
 
-const offset = 6;
-
 export default function Search() {
   const navigate = useNavigate();
   const moviePathMatch: PathMatch<string> | null = useMatch(
@@ -308,62 +261,46 @@ export default function Search() {
 
   const [searchParams, _] = useSearchParams();
   const keyword = searchParams.get("keyword");
-
-  const [randomNumber, setRandomNumber] = useState(0);
-  const [latestIndex, setLatestIndex] = useState(0);
-  const [topRatedIndex, setTopRatedIndex] = useState(0);
-  const [upCommingIndex, setUpCommingIndex] = useState(0);
-
   const [maxIndex, setMaxIndex] = useState(0);
-  const [latestLeaving, setLatestLeaving] = useState(false);
-  const [topRatedLeaving, setTopRatedLeaving] = useState(false);
-  const [upCommingLeaving, setUpCommingLeaving] = useState(false);
+  const [searchOffSet, setSearchOffSet] = useState(6);
 
-  const useGetMovieQuerys = () => {
-    const searchTv = useQuery<IGetMoviesResult>({
+  const [searchTvIndex, setSearchTvIndex] = useState(0);
+  const [searchMovieIndex, setSearchMovieIndex] = useState(0);
+
+  const [searchTvLeaving, setSearchTvLeaving] = useState(false);
+  const [searchMovieLeaving, setSearchMovieLeaving] = useState(false);
+
+  const searchTvToggleLeving = () => setSearchTvLeaving((current) => !current);
+  const searchMovieToggleLeving = () =>
+    setSearchMovieLeaving((current) => !current);
+
+  const useGetSearchQuery = () => {
+    const searchTv = useQuery<ISearchResult>({
       queryKey: ["search", "tv"],
+      queryFn: async () => {
+        const response = await getSearchTv(keyword!);
+        console.log(response);
+        return response;
+      },
+    });
+    const searchMovie = useQuery<ISearchResult>({
+      queryKey: ["search", "movie"],
       queryFn: async () => {
         const response = await getSearchMovie(keyword!);
         console.log(response);
         return response;
       },
     });
-    const topRated = useQuery<IGetMoviesResult>({
-      queryKey: ["movies", "topRated"],
-      queryFn: getMoviesTopRated,
-    });
 
-    return [searchTv, topRated];
+    return [searchTv, searchMovie];
   };
 
   const [
-    { isLoading: loadingSearchTv, data: searchTv },
-    { isLoading: loadingTopRated, data: topRatedData },
-  ] = useGetMovieQuerys();
+    { isLoading: loadingSearchTv, data: searchTvData },
+    { isLoading: loadingSearchMovie, data: searchMovieData },
+  ] = useGetSearchQuery();
 
   const onOverlayClick = () => navigate(-1);
-
-  useLayoutEffect(() => {
-    async function bgArrayRandomFunction() {
-      if (searchTv?.results.length === 0) {
-        return;
-      }
-
-      // const result = await bgArrayRandom(0, searchTv?.results.length! - 1 || 1);
-      // setRandomNumber(() => result);
-      // const maxIndex = Math.floor(searchTv?.results.length! / offset) - 1;
-      // setMaxIndex(maxIndex);
-      // console.log(result);
-      //console.log("topRated:", topRatedData?.results.length);
-    }
-
-    bgArrayRandomFunction();
-  }, []);
-
-  const latestToggleLeving = () => setLatestLeaving((current) => !current);
-  const topRatedToggleLeving = () => setTopRatedLeaving((current) => !current);
-  const upCommingLeavingToggleLeving = () =>
-    setUpCommingLeaving((current) => !current);
 
   const onBoxClicked = (
     movieId: number,
@@ -377,7 +314,7 @@ export default function Search() {
     posterPath?: string
   ) => {
     navigate(
-      `/movie/latest/${movieId}/${title}/${releaseDate}/${language}/${popularity}/${voteAverage}/${voteCount}/${posterPath?.replace(
+      `/latest/movie/${movieId}/${title}/${releaseDate}/${language}/${popularity}/${voteAverage}/${voteCount}/${posterPath?.replace(
         "/",
         ""
       )}/${adult}`
@@ -386,42 +323,30 @@ export default function Search() {
 
   const leftIndex = (index: number, value: string, data: any) => {
     if (data) {
-      if (value === movieStatus.latest) {
-        latestToggleLeving();
+      if (value === searchStatus.searchTv) {
+        searchTvToggleLeving();
       }
-
-      if (value === movieStatus.topRated) {
-        topRatedToggleLeving();
+      if (value === searchStatus.searchMovie) {
+        searchMovieToggleLeving();
       }
-
-      if (value === movieStatus.upComming) {
-        upCommingLeavingToggleLeving();
-      }
-
       const totalMovies = data.results.length;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      const maxIndex = Math.floor(totalMovies / searchOffSet) - 1;
       setMaxIndex(maxIndex);
       if (index === 0) {
         return;
       } else if (index > 0) {
-        if (value === movieStatus.latest) {
-          return setLatestIndex((current) => current - 1);
+        if (value === searchStatus.searchTv) {
+          return setSearchTvIndex((current) => current - 1);
         }
-        if (value === movieStatus.topRated) {
-          return setTopRatedIndex((current) => current - 1);
-        }
-        if (value === movieStatus.upComming) {
-          return setUpCommingIndex((current) => current - 1);
+        if (value === searchStatus.searchMovie) {
+          return setSearchMovieIndex((current) => current - 1);
         }
       } else if (index === maxIndex) {
-        if (value === movieStatus.latest) {
-          return setLatestIndex(0);
+        if (value === searchStatus.searchTv) {
+          return setSearchTvIndex(0);
         }
-        if (value === movieStatus.topRated) {
-          return setTopRatedIndex(0);
-        }
-        if (value === movieStatus.upComming) {
-          return setUpCommingIndex(0);
+        if (value === searchStatus.searchMovie) {
+          return setSearchMovieIndex(0);
         }
       }
     }
@@ -429,41 +354,30 @@ export default function Search() {
 
   const rightIndex = (index: number, value: string, data: any) => {
     if (data) {
-      if (value === movieStatus.latest) {
-        latestToggleLeving();
+      if (value === searchStatus.searchTv) {
+        searchTvToggleLeving();
       }
-
-      if (value === movieStatus.topRated) {
-        topRatedToggleLeving();
-      }
-
-      if (value === movieStatus.upComming) {
-        upCommingLeavingToggleLeving();
+      if (value === searchStatus.searchMovie) {
+        searchMovieToggleLeving();
       }
       const totalMovies = data.results.length;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
+      const maxIndex = Math.floor(totalMovies / searchOffSet) - 1;
       setMaxIndex(maxIndex);
       console.log(maxIndex);
 
       if (index >= 0) {
-        if (value === movieStatus.latest) {
-          return setLatestIndex((current) => current + 1);
+        if (value === searchStatus.searchTv) {
+          return setSearchTvIndex((current) => current + 1);
         }
-        if (value === movieStatus.topRated) {
-          return setTopRatedIndex((current) => current + 1);
-        }
-        if (value === movieStatus.upComming) {
-          return setUpCommingIndex((current) => current + 1);
+        if (value === searchStatus.searchMovie) {
+          return setSearchMovieIndex((current) => current + 1);
         }
       } else if (index === maxIndex) {
-        if (value === movieStatus.latest) {
-          return setLatestIndex(0);
+        if (value === searchStatus.searchTv) {
+          return setSearchTvIndex(0);
         }
-        if (value === movieStatus.topRated) {
-          return setTopRatedIndex(0);
-        }
-        if (value === movieStatus.upComming) {
-          return setUpCommingIndex(0);
+        if (value === searchStatus.searchMovie) {
+          return setSearchMovieIndex(0);
         }
       }
     }
@@ -471,33 +385,15 @@ export default function Search() {
 
   return (
     <>
-      {loadingSearchTv ? (
-        <span>Loading...</span>
-      ) : (
-        <span style={{ fontSize: "15px", color: "white" }}>
-          {searchTv?.results.length}
-        </span>
-      )}
-      {/* <Wrapper>
-        {loadingLatest && loadingTopRated ? (
+      <Wrapper>
+        {loadingSearchTv && loadingSearchMovie ? (
           <>
             <Loader>
-              <span>로딩중</span>
+              <span>로딩중...</span>
             </Loader>
           </>
         ) : (
           <>
-            <Banner
-              bgphoto={makeImgPath(
-                latestData?.results[randomNumber || 19].backdrop_path || ""
-              )}
-            >
-              <Title>{latestData?.results[randomNumber || 19].title}</Title>
-              <Overview>
-                {latestData?.results[randomNumber || 19].overview}
-              </Overview>
-            </Banner>
-
             <div
               style={{
                 position: "relative",
@@ -509,35 +405,36 @@ export default function Search() {
                 style={{
                   position: "absolute",
                   width: "100%",
-                  top: 100,
+                  bottom: -100,
                   paddingBottom: "20px",
                   display: "flex",
                   flexDirection: "column",
+                  left: 10,
                 }}
               >
-                <LatestSlider>
+                <SearchTvSlider>
                   <AnimatePresence
                     initial={false}
-                    onExitComplete={latestToggleLeving}
+                    onExitComplete={searchTvToggleLeving}
                   >
                     <span style={{ position: "absolute", top: "-260px" }}>
                       LatestMovie
                     </span>
-                    <LatestRow
-                      variants={latestRowVariants}
-                      initial={latestIndex > 0 ? "hidden" : "exit"}
+                    <SearchTvRow
+                      variants={SearchTvRowVariants}
+                      initial={searchTvIndex > 0 ? "hidden" : "exit"}
                       animate="visible"
-                      exit={latestIndex < maxIndex ? "exit" : "hidden"}
+                      exit={searchTvIndex < maxIndex ? "exit" : "hidden"}
                       transition={{ type: "tween", duration: 1 }}
-                      key={latestIndex}
+                      key={searchTvIndex}
                     >
-                      {latestIndex > 0 ? (
+                      {searchTvIndex > 0 ? (
                         <LeftBtn
                           onClick={() =>
                             leftIndex(
-                              latestIndex,
-                              movieStatus.latest,
-                              latestData
+                              searchTvIndex,
+                              searchStatus.searchTv,
+                              searchTvData
                             )
                           }
                         >
@@ -545,84 +442,82 @@ export default function Search() {
                         </LeftBtn>
                       ) : null}
 
-                      {latestData?.results
+                      {searchTvData?.results
                         .slice(
-                          offset * latestIndex,
-                          offset * latestIndex + offset
+                          searchOffSet * searchTvIndex,
+                          searchOffSet * searchTvIndex + searchOffSet
                         )
-                        .map((movie) => (
+                        .map((tv) => (
                           <Box
-                            layoutId={String(movie.id)}
-                            key={movie.id}
-                            onClick={() =>
-                              onBoxClicked(
-                                movie.id,
-                                movie.adult,
-                                movie.title,
-                                movie.original_language,
-                                movie.popularity,
-                                movie.release_date,
-                                movie.vote_average,
-                                movie.vote_count,
-                                movie.poster_path
-                              )
-                            }
+                            layoutId={String(tv.id)}
+                            key={tv.id}
+                            // onClick={() =>
+                            //   onBoxClicked(
+                            //     tv.id,
+                            //     tv.adult,
+                            //     tv.original_language,
+                            //     tv.popularity,
+                            //     tv.vote_average,
+                            //     tv.vote_count,
+                            //     tv.poster_path
+                            //   )
+                            // }
                             initial="normal"
                             whileHover="hover"
                             transition={{ type: "tween" }}
                             variants={boxVariants}
                             bgphoto={makeImgPath(
-                              movie.backdrop_path || "",
+                              tv.backdrop_path || "",
                               "w500"
                             )}
                           >
                             <img />
                             <Info variants={infoVariants}>
-                              <h4>{movie.title}</h4>
+                              <h4>{tv.original_name}</h4>
                             </Info>
                           </Box>
                         ))}
 
-                      {latestIndex === maxIndex ? null : (
+                      {searchTvIndex === maxIndex ? null : (
                         <RightBtn
                           onClick={() =>
                             rightIndex(
-                              latestIndex,
-                              movieStatus.latest,
-                              latestData
+                              searchTvIndex,
+                              searchStatus.searchTv,
+                              searchTvData
                             )
                           }
                         >
                           <span>{">"}</span>
                         </RightBtn>
                       )}
-                    </LatestRow>
+                    </SearchTvRow>
                   </AnimatePresence>
-                </LatestSlider>
+                </SearchTvSlider>
 
-                <TopRatedSlider>
+                <SearchMovieSlider>
                   <AnimatePresence
                     initial={false}
-                    onExitComplete={topRatedToggleLeving}
+                    onExitComplete={searchMovieToggleLeving}
                   >
                     <span style={{ position: "absolute", bottom: "5px" }}>
-                      TopRateMovie
+                      SearchMovie
                     </span>
-                    <TopRatedRow
-                      variants={TopRatedRowVariants}
-                      initial={topRatedIndex > 0 ? "hidden" : "exit"}
+                    <SearchMovieRow
+                      variants={SearchMovieRowVariants}
+                      initial={searchMovieIndex > 0 ? "hidden" : "exit"}
                       animate="visible"
-                      exit={topRatedIndex < maxIndex ? "exit" : "hidden"}
+                      exit={searchMovieIndex < maxIndex ? "exit" : "hidden"}
                       transition={{ type: "tween", duration: 1 }}
-                      key={topRatedIndex}
+                      key={searchMovieIndex}
                     >
-                      {topRatedIndex > 0 ? (
+                      {searchMovieIndex > 0 ? (
                         <LeftBtn
                           onClick={() =>
                             leftIndex(
-                              topRatedIndex,
-                              movieStatus.topRated,
-                              topRatedData
+                              searchMovieIndex,
+                              searchStatus.searchMovie,
+                              searchMovieData
                             )
                           }
                         >
@@ -630,60 +525,60 @@ export default function Search() {
                         </LeftBtn>
                       ) : null}
 
-                      {topRatedData?.results
+                      {searchMovieData?.results
                         .slice(
-                          offset * topRatedIndex,
-                          offset * topRatedIndex + offset
+                          searchOffSet * searchMovieIndex,
+                          searchOffSet * searchMovieIndex + searchOffSet
                         )
-                        .map((movie) => (
+                        .map((tv) => (
                           <Box
-                            layoutId={String(movie.id)}
-                            key={movie.id}
-                            onClick={() =>
-                              onBoxClicked(
-                                movie.id,
-                                movie.adult,
-                                movie.title,
-                                movie.original_language,
-                                movie.popularity,
-                                movie.release_date,
-                                movie.vote_average,
-                                movie.vote_count,
-                                movie.poster_path
-                              )
-                            }
+                            layoutId={String(tv.id)}
+                            key={tv.id}
+                            // onClick={() =>
+                            //   onBoxClicked(
+                            //     movie.id,
+                            //     movie.adult,
+                            //     movie.title,
+                            //     movie.original_language,
+                            //     movie.popularity,
+                            //     movie.release_date,
+                            //     movie.vote_average,
+                            //     movie.vote_count,
+                            //     movie.poster_path
+                            //   )
+                            // }
                             initial="normal"
                             whileHover="hover"
                             transition={{ type: "tween" }}
                             variants={boxVariants}
                             bgphoto={makeImgPath(
-                              movie.backdrop_path || "",
+                              tv.backdrop_path || "",
                               "w500"
                             )}
                           >
                             <img />
                             <Info variants={infoVariants}>
-                              <h4>{movie.title}</h4>
+                              <h4>{tv.original_title}</h4>
                             </Info>
                           </Box>
                         ))}
 
-                      {topRatedIndex === maxIndex ? null : (
+                      {searchMovieIndex === maxIndex ? null : (
                         <RightBtn
                           onClick={() =>
                             rightIndex(
-                              topRatedIndex,
-                              movieStatus.topRated,
-                              topRatedData
+                              searchMovieIndex,
+                              searchStatus.searchMovie,
+                              searchMovieData
                             )
                           }
                         >
                           <span>{">"}</span>
                         </RightBtn>
                       )}
-                    </TopRatedRow>
+                    </SearchMovieRow>
                   </AnimatePresence>
-                </TopRatedSlider>
+                </SearchMovieSlider>
 
                 <AnimatePresence>
                   {moviePathMatch ? (
@@ -734,7 +629,7 @@ export default function Search() {
             </div>
           </>
         )}
-      </Wrapper> */}
+      </Wrapper>
     </>
   );
 }

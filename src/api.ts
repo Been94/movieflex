@@ -171,51 +171,55 @@ export interface ITvTopRatedResult {
   total_results: number;
 }
 
-export interface ISearchMovie {
-  adult: boolean;
-  backdrop_path: string;
-  id: number;
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  release_date: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
+export interface ISearch {
+  adult?: boolean;
+  backdrop_path?: string;
+  id?: number;
+  original_language?: string;
+  original_title?: string;
+  original_name?: string;
+  overview?: string;
+  popularity?: number;
+  poster_path?: string;
+  first_air_date?: string;
+  release_date?: string;
+  title?: string;
+  name?: string;
+  video?: boolean;
+  vote_average?: number;
+  vote_count?: number;
+  origin_country?: [];
 }
 
-export interface ISearchMovieResult {
+export interface ISearchResult {
   page: number;
-  results: ISearchMovie[];
+  results: ISearch[];
   total_pages: number;
   total_results: number;
 }
 
-export interface ISearchTv {
-  adult: boolean;
-  backdrop_path: string;
-  id: number;
-  origin_country: [];
-  original_language: string;
-  original_name: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  first_air_date: string;
-  name: string;
-  vote_average: number;
-  vote_count: number;
-}
+// export interface ISearchTv {
+//   adult?: boolean;
+//   backdrop_path?: string;
+//   id?: number;
+//   original_language?: string;
+//   original_name?: string;
+//   overview?: string;
+//   popularity?: number;
+//   poster_path?: string;
+//   first_air_date?: string;
+//   name?: string;
+//   vote_average?: number;
+//   vote_count?: number;
+//   origin_country?: [];
+// }
 
-export interface ISearchTvResult {
-  page: number;
-  results: ISearchTv[];
-  total_pages: number;
-  total_results: number;
-}
+// export interface ISearchTvResult {
+//   page: number;
+//   results: ISearchTv[];
+//   total_pages: number;
+//   total_results: number;
+// }
 
 const options = {
   method: "GET",
@@ -270,7 +274,13 @@ export function getTvTopRated() {
 
 export function getSearchMovie(keyword: string) {
   return fetch(
-    `${BASE_PATH}/search/movie?query=${keyword}&include_adult=false&language=en-US&page=1`,
+    `${BASE_PATH}/search/movie?query=${keyword}&include_adult=true&language=en-US&page=1`,
+    options
+  ).then((res) => res.json());
+}
+export function getSearchTv(keyword: string) {
+  return fetch(
+    `${BASE_PATH}/search/tv?query=${keyword}&include_adult=true&language=en-US&page=1`,
     options
   ).then((res) => res.json());
 }

@@ -168,11 +168,12 @@ export default function Header() {
       navAnimation.start("top");
     }
 
-    console.log(scrollY.get());
+    // console.log(scrollY.get());
   });
 
   const onValid = (data: IForm) => {
     navigate(`/search?keyword=${data.keyword}`);
+    window.location.reload();
     resetField("keyword", { keepTouched: true });
     toggleSearch();
   };

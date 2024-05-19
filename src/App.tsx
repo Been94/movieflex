@@ -2,8 +2,8 @@ import "./App.css";
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Routes/Home";
 import Tv from "./Routes/Tv";
-import Search from "./Routes/Search";
 import Header from "./Components/Header";
+import Search from "./Routes/Search";
 
 function App() {
   return (

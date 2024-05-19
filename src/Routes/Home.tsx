@@ -49,6 +49,42 @@ const Row = styled(motion.div)`
   width: 100%;
 `;
 
+const LeftBtn = styled(motion.div)`
+  position: absolute;
+  left: 0;
+  width: 40px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  font-size: 40px;
+  cursor: pointer;
+  span {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+`;
+
+const RightBtn = styled(motion.div)`
+  position: absolute;
+  right: 0;
+  width: 40px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  font-size: 40px;
+  cursor: pointer;
+  span {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+`;
+
 const Box = styled(motion.div)<{ bgphoto: string }>`
   background-color: white;
   height: 200px;
@@ -194,6 +230,7 @@ export default function Home() {
 
   const [randomNumber, setRandomNumber] = useState(0);
   const [index, setIndex] = useState(0);
+  const [maxIndex, setMaxIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
 
   const toggleLeving = () => setLeaving((current) => !current);
@@ -225,7 +262,73 @@ export default function Home() {
         toggleLeving();
         const totalMovies = data.results.length;
         const maxIndex = Math.floor(totalMovies / offset) - 1;
-        return setIndex((current) => (current === maxIndex ? 0 : current + 1));
+        setMaxIndex(maxIndex);
+        console.log(maxIndex);
+        if (index >= 0) {
+          return setIndex((current) =>
+            current === maxIndex ? 0 : current + 1
+          );
+        } else {
+          return setIndex((current) =>
+            current === maxIndex ? 0 : current - 1
+          );
+        }
+      }
+    }
+  };
+
+  const leftIndex = () => {
+    if (data) {
+      if (leaving) {
+        return;
+      } else {
+        toggleLeving();
+        const totalMovies = data.results.length;
+        const maxIndex = Math.floor(totalMovies / offset) - 1;
+        setMaxIndex(maxIndex);
+        //console.log(maxIndex);
+
+        console.log("index", index);
+        // return setIndex((current) =>
+        //   current === maxIndex ? 0 : current - 1
+        // );
+        if (index === 0) {
+          return;
+        } else if (index > 0) {
+          return setIndex((current) => current - 1);
+        } else if (index === maxIndex) {
+          return setIndex(0);
+        }
+      }
+    }
+  };
+
+  const rightIndex = () => {
+    if (data) {
+      if (leaving) {
+        return;
+      } else {
+        toggleLeving();
+        const totalMovies = data.results.length;
+        const maxIndex = Math.floor(totalMovies / offset) - 1;
+        setMaxIndex(maxIndex);
+        console.log(maxIndex);
+
+        if (index >= 0) {
+          return setIndex((current) => current + 1);
+        } else if (index === maxIndex) {
+          return setIndex(0);
+        }
+
+        // if (index >= 0) {
+        //   return setIndex((current) =>
+        //     current === maxIndex ? 0 : current + 1
+        //   );
+        // } else {
+        //   return setIndex((current) =>
+        //     current === maxIndex ? 0 : current - 1
+        //   );
+        // }
       }
     }
   };
@@ -241,8 +344,11 @@ export default function Home() {
     async function bgArrayRandomFunction() {
       const result = await bgArrayRandom(0, data?.results.length! - 1 || 19);
       setRandomNumber(() => result);
+      const maxIndex = Math.floor(data?.results.length! / offset) - 1;
+      setMaxIndex(maxIndex);
       console.log(result);
     }
+
     bgArrayRandomFunction();
   }, []);
 
@@ -260,7 +366,7 @@ export default function Home() {
         ) : (
           <>
             <Banner
-              onClick={incraseIndex}
+              // onClick={incraseIndex}
               bgphoto={makeImgPath(
                 data?.results[randomNumber || 19].backdrop_path || ""
               )}
@@ -272,12 +378,18 @@ export default function Home() {
               <AnimatePresence initial={false} onExitComplete={toggleLeving}>
                 <Row
                   variants={rowVariants}
-                  initial="hidden"
+                  initial={index > 0 ? "hidden" : "exit"}
                   animate="visible"
-                  exit="exit"
+                  exit={index < maxIndex ? "exit" : "hidden"}
                   transition={{ type: "tween", duration: 1 }}
                   key={index}
                 >
+                  {index > 0 ? (
+                    <LeftBtn onClick={leftIndex}>
+                      <span>{"<"}</span>
+                    </LeftBtn>
+                  ) : null}
+
                   {data?.results
                     .slice(offset * index, offset * index + offset)
                     .map((movie) => (
@@ -309,6 +421,11 @@ export default function Home() {
                         </Info>
                       </Box>
                     ))}
+                  {index === maxIndex ? null : (
+                    <RightBtn onClick={rightIndex}>
+                      <span>{">"}</span>
+                    </RightBtn>
+                  )}
                 </Row>
               </AnimatePresence>
             </Slider>

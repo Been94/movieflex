@@ -12,11 +12,13 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<Home />}>
-            {/* <Route path="movie/:id" element={<Home />} /> */}
             <Route
-              path="movie/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
+              path="movie/latest/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
               element={<Home />}
-            ></Route>
+            >
+              <Route path="movie/top_rated/:id" element={<Home />} />
+              <Route path="movie/upcoming/:id" element={<Home />} />
+            </Route>
           </Route>
           <Route path="/tv" element={<Tv />}>
             <Route path="tv/:id" element={<Home />} />

@@ -1,4 +1,9 @@
-import { IGetMoviesResult, getMovies } from "../api";
+import {
+  IGetMoviesResult,
+  getMovies,
+  getMoviesTopRated,
+  getMoviesUpcoming,
+} from "../api";
 import styled from "styled-components";
 import { bgArrayRandom, makeImgPath } from "./Util";
 import { useQuery } from "@tanstack/react-query";
@@ -36,9 +41,14 @@ const Overview = styled.p`
   width: 50%;
 `;
 
-const Slider = styled.div`
+const LatestSlider = styled.div`
   position: relative;
   top: -100px;
+`;
+
+const TopRatedSlider = styled.div`
+  position: relative;
+  top: -200px;
 `;
 
 const Row = styled(motion.div)`
@@ -154,9 +164,9 @@ const IsAdult = styled(motion.div)`
   padding-right: 20px;
 `;
 
-const IsAdultDetail = styled(motion.div)<{ isAdult: boolean }>`
+const IsAdultDetail = styled(motion.div)<{ isadult: boolean }>`
   border-radius: 10px;
-  background-color: ${(props) => (props.isAdult ? `green` : `tomato`)};
+  background-color: ${(props) => (props.isadult ? `green` : `tomato`)};
   width: 80px;
   height: 20px;
   display: flex;
@@ -172,6 +182,18 @@ const DetailMovieBottom = styled.div`
 
 const DetailMovieTitle = styled.div`
   font-size: xx-large;
+`;
+
+const NowPlaying = styled.div`
+  margin: 10px;
+  font-weight: bold;
+`;
+
+const SliderBackground = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
 `;
 
 const rowVariants = {
@@ -224,7 +246,7 @@ const offset = 6;
 export default function Home() {
   const navigate = useNavigate();
   const moviePathMatch: PathMatch<string> | null = useMatch(
-    "/movie/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
+    "/movie/latest/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
   );
   console.log(moviePathMatch);
 
@@ -232,6 +254,46 @@ export default function Home() {
   const [index, setIndex] = useState(0);
   const [maxIndex, setMaxIndex] = useState(0);
   const [leaving, setLeaving] = useState(false);
+
+  const useGetMovieQuerys = () => {
+    const latest = useQuery<IGetMoviesResult>({
+      queryKey: ["movies", "latest"],
+      queryFn: getMovies,
+    });
+    const topRated = useQuery<IGetMoviesResult>({
+      queryKey: ["movies", "topRated"],
+      queryFn: getMoviesTopRated,
+    });
+
+    const upComming = useQuery<IGetMoviesResult>({
+      queryKey: ["movies", "upComming"],
+      queryFn: getMoviesUpcoming,
+    });
+    return [latest, topRated, upComming];
+  };
+
+  const [
+    { isLoading: loadingLatest, data: latestData },
+    { isLoading: loadingTopRated, data: topRatedData },
+    { isLoading: loadingUpComming, data: upCommingData },
+  ] = useGetMovieQuerys();
+
+  const onOverlayClick = () => navigate(-1);
+
+  useLayoutEffect(() => {
+    async function bgArrayRandomFunction() {
+      const result = await bgArrayRandom(
+        0,
+        latestData?.results.length! - 1 || 19
+      );
+      setRandomNumber(() => result);
+      const maxIndex = Math.floor(latestData?.results.length! / offset) - 1;
+      setMaxIndex(maxIndex);
+      console.log(result);
+    }
+
+    bgArrayRandomFunction();
+  }, []);
 
   const toggleLeving = () => setLeaving((current) => !current);
 
@@ -247,51 +309,22 @@ export default function Home() {
     posterPath?: string
   ) => {
     navigate(
-      `/movie/${movieId}/${title}/${releaseDate}/${language}/${popularity}/${voteAverage}/${voteCount}/${posterPath?.replace(
+      `/movie/latest/${movieId}/${title}/${releaseDate}/${language}/${popularity}/${voteAverage}/${voteCount}/${posterPath?.replace(
         "/",
         ""
       )}/${adult}`
     );
   };
 
-  const incraseIndex = () => {
-    if (data) {
-      if (leaving) {
-        return;
-      } else {
-        toggleLeving();
-        const totalMovies = data.results.length;
-        const maxIndex = Math.floor(totalMovies / offset) - 1;
-        setMaxIndex(maxIndex);
-        console.log(maxIndex);
-        if (index >= 0) {
-          return setIndex((current) =>
-            current === maxIndex ? 0 : current + 1
-          );
-        } else {
-          return setIndex((current) =>
-            current === maxIndex ? 0 : current - 1
-          );
-        }
-      }
-    }
-  };
-
   const leftIndex = () => {
-    if (data) {
+    if (latestData) {
       if (leaving) {
         return;
       } else {
         toggleLeving();
-        const totalMovies = data.results.length;
+        const totalMovies = latestData.results.length;
         const maxIndex = Math.floor(totalMovies / offset) - 1;
         setMaxIndex(maxIndex);
-        //console.log(maxIndex);
-
-        console.log("index", index);
-        // return setIndex((current) =>
-        //   current === maxIndex ? 0 : current - 1
-        // );
         if (index === 0) {
           return;
         } else if (index > 0) {
@@ -304,12 +337,12 @@ export default function Home() {
   };
 
   const rightIndex = () => {
-    if (data) {
+    if (latestData) {
       if (leaving) {
         return;
       } else {
         toggleLeving();
-        const totalMovies = data.results.length;
+        const totalMovies = latestData.results.length;
         const maxIndex = Math.floor(totalMovies / offset) - 1;
         setMaxIndex(maxIndex);
         console.log(maxIndex);
@@ -319,45 +352,21 @@ export default function Home() {
         } else if (index === maxIndex) {
           return setIndex(0);
         }
-
-        // if (index >= 0) {
-        //   return setIndex((current) =>
-        //     current === maxIndex ? 0 : current + 1
-        //   );
-        // } else {
-        //   return setIndex((current) =>
-        //     current === maxIndex ? 0 : current - 1
-        //   );
-        // }
       }
     }
   };
 
-  const { data, isLoading } = useQuery<IGetMoviesResult>({
-    queryKey: ["movies", "nowPlaying"],
-    queryFn: getMovies,
-  });
-
-  const onOverlayClick = () => navigate(-1);
-
-  useLayoutEffect(() => {
-    async function bgArrayRandomFunction() {
-      const result = await bgArrayRandom(0, data?.results.length! - 1 || 19);
-      setRandomNumber(() => result);
-      const maxIndex = Math.floor(data?.results.length! / offset) - 1;
-      setMaxIndex(maxIndex);
-      console.log(result);
-    }
-
-    bgArrayRandomFunction();
-  }, []);
+  // const { data, isLoading } = useQuery<IGetMoviesResult>({
+  //   queryKey: ["movies", "latest"],
+  //   queryFn: getMovies,
+  // });
 
   //console.log(randomNumber);
 
   return (
     <>
       <Wrapper>
-        {isLoading ? (
+        {loadingLatest ? (
           <>
             <Loader>
               <span>로딩중</span>
@@ -366,16 +375,20 @@ export default function Home() {
         ) : (
           <>
             <Banner
-              // onClick={incraseIndex}
               bgphoto={makeImgPath(
-                data?.results[randomNumber || 19].backdrop_path || ""
+                latestData?.results[randomNumber || 19].backdrop_path || ""
               )}
             >
-              <Title>{data?.results[randomNumber || 19].title}</Title>
-              <Overview>{data?.results[randomNumber || 19].overview}</Overview>
+              <Title>{latestData?.results[randomNumber || 19].title}</Title>
+              <Overview>
+                {latestData?.results[randomNumber || 19].overview}
+              </Overview>
             </Banner>
-            <Slider>
+            <LatestSlider>
               <AnimatePresence initial={false} onExitComplete={toggleLeving}>
+                <NowPlaying>
+                  <span>Latest movies</span>
+                </NowPlaying>
                 <Row
                   variants={rowVariants}
                   initial={index > 0 ? "hidden" : "exit"}
@@ -390,11 +403,11 @@ export default function Home() {
                     </LeftBtn>
                   ) : null}
 
-                  {data?.results
+                  {latestData?.results
                     .slice(offset * index, offset * index + offset)
                     .map((movie) => (
                       <Box
-                        layoutId={String(movie.id)}
+                        layoutId={String(movie.id + 1)}
                         key={movie.id}
                         onClick={() =>
                           onBoxClicked(
@@ -428,7 +441,7 @@ export default function Home() {
                   )}
                 </Row>
               </AnimatePresence>
-            </Slider>
+            </LatestSlider>
             <AnimatePresence>
               {moviePathMatch ? (
                 <>
@@ -443,7 +456,7 @@ export default function Home() {
                     <DetailMovie>
                       <IsAdult>
                         <IsAdultDetail
-                          isAdult={Boolean(moviePathMatch.params.adult)}
+                          isadult={Boolean(moviePathMatch.params.adult)}
                         >
                           {Boolean(moviePathMatch.params.adult) ? (
                             <span>No Adult</span>

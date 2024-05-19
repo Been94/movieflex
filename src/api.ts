@@ -29,16 +29,78 @@ export interface IGetMoviesResult {
   total_results: number;
 }
 
-export function getMovies() {
-  const options = {
-    method: "GET",
-    headers: {
-      accept: "application/json",
-      Authorization: `Bearer ${BEARER_KEY}`,
-    },
+export interface ITopRated {
+  adult: boolean;
+  backdrop_path: string;
+  id: number;
+  original_language: string;
+  original_title: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  release_date: string;
+  title: string;
+  video: boolean;
+  vote_average: number;
+  vote_count: number;
+}
+
+export interface ITopRatedResult {
+  page: number;
+  results: ITopRated[];
+  total_pages: number;
+  total_results: number;
+}
+
+export interface IUpcoming {
+  adult: boolean;
+  backdrop_path: string;
+  id: number;
+  original_language: string;
+  original_title: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  release_date: string;
+  title: string;
+  video: boolean;
+  vote_average: number;
+  vote_count: number;
+}
+
+export interface IUpcomingResult {
+  dates: {
+    maximum: string;
+    minimum: string;
   };
+  page: number;
+  results: IUpcoming[];
+  total_pages: number;
+  total_results: number;
+}
+const options = {
+  method: "GET",
+  headers: {
+    accept: "application/json",
+    Authorization: `Bearer ${BEARER_KEY}`,
+  },
+};
+export function getMovies() {
   return fetch(
     `${BASE_PATH}/movie/now_playing?language=en-US&page=1`,
+    options
+  ).then((res) => res.json());
+}
+
+export function getMoviesTopRated() {
+  return fetch(
+    `${BASE_PATH}/movie/top_rated?language=en-US&page=1`,
+    options
+  ).then((res) => res.json());
+}
+export function getMoviesUpcoming() {
+  return fetch(
+    `${BASE_PATH}/movie/upcoming?language=en-US&page=1`,
     options
   ).then((res) => res.json());
 }

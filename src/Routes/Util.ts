@@ -5,6 +5,14 @@ export async function bgArrayRandom(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+export function dummyDataMsgMake(value: string, errorMsg: string) {
+  if (value === "") {
+    return `${errorMsg} is noData!`;
+  } else {
+    return value;
+  }
+}
+
 export enum movieStatus {
   latest = "latest",
   topRated = "topRated",

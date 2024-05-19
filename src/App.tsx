@@ -22,7 +22,7 @@ function App() {
           </Route>
           <Route path="/tv" element={<Tv />}>
             <Route
-              path="latest/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
+              path="latest/:id/:original_name/:original_language/:overview/:popularity/:poster_path/:first_air_date/:popularity/:vote_average/:vote_count/:adult"
               element={<Tv />}
             >
               <Route path="tv/airing_today/:id" element={<Tv />} />

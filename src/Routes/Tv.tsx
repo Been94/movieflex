@@ -1,15 +1,12 @@
 import {
-  IHomeMoviesResult,
-  getMovies,
-  getMoviesTopRated,
-  getMoviesUpcoming,
+  ITvResult,
   getTv,
   getTvAiringToday,
   getTvPopular,
   getTvTopRated,
 } from "../api";
 import styled from "styled-components";
-import { tvStatus, bgArrayRandom, makeImgPath } from "./Util";
+import { tvStatus, bgArrayRandom, makeImgPath, dummyDataMsgMake } from "./Util";
 import { useQuery } from "@tanstack/react-query";
 import { useLayoutEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -333,7 +330,7 @@ const offset = 6;
 export default function Tv() {
   const navigate = useNavigate();
   const moviePathMatch: PathMatch<string> | null = useMatch(
-    "/tv/latest/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
+    "/tv/latest/:id/:original_name/:original_language/:overview/:popularity/:poster_path/:first_air_date/:popularity/:vote_average/:vote_count/:adult"
   );
   //console.log(moviePathMatch);
 
@@ -351,21 +348,21 @@ export default function Tv() {
   const [tvTopRatedLeaving, setTvTopRatedLeaving] = useState(false);
 
   const useGetTvQuerys = () => {
-    const tvLatest = useQuery<IHomeMoviesResult>({
+    const tvLatest = useQuery<ITvResult>({
       queryKey: ["tv", "tvLatest"],
       queryFn: getTv,
     });
-    const tvAiringToday = useQuery<IHomeMoviesResult>({
+    const tvAiringToday = useQuery<ITvResult>({
       queryKey: ["tv", "tvAiringToday"],
       queryFn: getTvAiringToday,
     });
 
-    const tvPopular = useQuery<IHomeMoviesResult>({
+    const tvPopular = useQuery<ITvResult>({
       queryKey: ["tv", "tvPopular"],
       queryFn: getTvPopular,
     });
 
-    const tvTopRated = useQuery<IHomeMoviesResult>({
+    const tvTopRated = useQuery<ITvResult>({
       queryKey: ["tv", "tvTopRated"],
       queryFn: getTvTopRated,
     });
@@ -409,22 +406,65 @@ export default function Tv() {
   const tvTopRatedToggleLeving = () =>
     setTvTopRatedLeaving((current) => !current);
 
+  // adult: 성인여부,
+  // id: 고유번호,
+  // original_language: 언어,
+  // original_name: 타이틀,
+  // overview: 줄거리,
+  // popularity: 인기율,
+  // poster_path: 포스터 경로,
+  // first_air_date: 출시일,
+  // vote_average: 평균 투표율,
+  // vote_count: 투표 카운터
+
   const onBoxClicked = (
-    movieId: number,
     adult: boolean,
-    title: string,
-    language: string,
-    popularity?: number,
-    releaseDate?: string,
-    voteAverage?: number,
-    voteCount?: number,
-    posterPath?: string
+    id: number,
+    popularity: number,
+    vote_average: number,
+    vote_count: number,
+
+    original_language: string,
+    original_name: string,
+    overview: string,
+    poster_path: string,
+    first_air_date: string
   ) => {
+    original_language = original_language.replace("/", "");
+    original_name = original_name.replace("/", "");
+    overview = overview.replace("/", "");
+    poster_path = poster_path.replace("/", "");
+    first_air_date = first_air_date.replace("/", "");
+
+    popularity = Math.round(popularity);
+    vote_average = Math.round(vote_average);
+    vote_count = Math.round(vote_count);
+
+    // console.log("adult", adult);
+    // console.log("id", id);
+    // console.log("popularity", popularity);
+    // console.log("vote_average", vote_average);
+    // console.log("vote_count", vote_count);
+    // console.log("original_language", original_language);
+    // console.log("original_name", original_name);
+    // console.log("overview", overview);
+    // console.log("poster_path", poster_path);
+    // console.log("first_air_date", first_air_date);
+
     navigate(
-      `/tv/latest/${movieId}/${title}/${releaseDate}/${language}/${popularity}/${voteAverage}/${voteCount}/${posterPath?.replace(
-        "/",
-        ""
-      )}/${adult}`
+      `/tv/latest/${id}/${dummyDataMsgMake(
+        original_name,
+        "Name"
+      )}/${dummyDataMsgMake(original_language, "Language")}/${dummyDataMsgMake(
+        overview,
+        "Overview"
+      )}/${popularity}/${dummyDataMsgMake(
+        poster_path,
+        "posterPath"
+      )}/${dummyDataMsgMake(
+        first_air_date,
+        "releaseDate"
+      )}/${popularity}/${vote_average}/${vote_count}/${adult}`
     );
   };
 
@@ -547,7 +587,9 @@ export default function Tv() {
                 tvLatestData?.results[randomNumber || 19].backdrop_path || ""
               )}
             >
-              <Title>{tvLatestData?.results[randomNumber || 19].title}</Title>
+              <Title>
+                {tvLatestData?.results[randomNumber || 19].original_name}
+              </Title>
               <Overview>
                 {tvLatestData?.results[randomNumber || 19].overview}
               </Overview>
@@ -611,15 +653,16 @@ export default function Tv() {
                             key={tv.id}
                             onClick={() =>
                               onBoxClicked(
-                                tv.id,
                                 tv.adult,
-                                tv.title,
-                                tv.original_language,
+                                tv.id,
                                 tv.popularity,
-                                tv.release_date,
                                 tv.vote_average,
                                 tv.vote_count,
-                                tv.poster_path
+                                tv.original_language,
+                                tv.original_name,
+                                tv.overview,
+                                tv.poster_path,
+                                tv.first_air_date
                               )
                             }
                             initial="normal"
@@ -633,7 +676,7 @@ export default function Tv() {
                           >
                             <img />
                             <Info variants={infoVariants}>
-                              <h4>{tv.title}</h4>
+                              <h4>{tv.original_name}</h4>
                             </Info>
                           </Box>
                         ))}
@@ -696,15 +739,16 @@ export default function Tv() {
                             key={tv.id}
                             onClick={() =>
                               onBoxClicked(
-                                tv.id,
                                 tv.adult,
-                                tv.title,
-                                tv.original_language,
+                                tv.id,
                                 tv.popularity,
-                                tv.release_date,
                                 tv.vote_average,
                                 tv.vote_count,
-                                tv.poster_path
+                                tv.original_language,
+                                tv.original_name,
+                                tv.overview,
+                                tv.poster_path,
+                                tv.first_air_date
                               )
                             }
                             initial="normal"
@@ -718,7 +762,7 @@ export default function Tv() {
                           >
                             <img />
                             <Info variants={infoVariants}>
-                              <h4>{tv.title}</h4>
+                              <h4>{tv.original_name}</h4>
                             </Info>
                           </Box>
                         ))}
@@ -782,15 +826,16 @@ export default function Tv() {
                             key={tv.id}
                             onClick={() =>
                               onBoxClicked(
-                                tv.id,
                                 tv.adult,
-                                tv.title,
-                                tv.original_language,
+                                tv.id,
                                 tv.popularity,
-                                tv.release_date,
                                 tv.vote_average,
                                 tv.vote_count,
-                                tv.poster_path
+                                tv.original_language,
+                                tv.original_name,
+                                tv.overview,
+                                tv.poster_path,
+                                tv.first_air_date
                               )
                             }
                             initial="normal"
@@ -804,7 +849,7 @@ export default function Tv() {
                           >
                             <img />
                             <Info variants={infoVariants}>
-                              <h4>{tv.title}</h4>
+                              <h4>{tv.original_name}</h4>
                             </Info>
                           </Box>
                         ))}
@@ -868,15 +913,16 @@ export default function Tv() {
                             key={tv.id}
                             onClick={() =>
                               onBoxClicked(
-                                tv.id,
                                 tv.adult,
-                                tv.title,
-                                tv.original_language,
+                                tv.id,
                                 tv.popularity,
-                                tv.release_date,
                                 tv.vote_average,
                                 tv.vote_count,
-                                tv.poster_path
+                                tv.original_language,
+                                tv.original_name,
+                                tv.overview,
+                                tv.poster_path,
+                                tv.first_air_date
                               )
                             }
                             initial="normal"
@@ -890,7 +936,7 @@ export default function Tv() {
                           >
                             <img />
                             <Info variants={infoVariants}>
-                              <h4>{tv.title}</h4>
+                              <h4>{tv.original_name}</h4>
                             </Info>
                           </Box>
                         ))}
@@ -938,7 +984,7 @@ export default function Tv() {
                           <div
                             style={{
                               backgroundImage: `url(${makeImgPath(
-                                "/" + moviePathMatch.params.posterPath!
+                                "/" + moviePathMatch.params.poster_path!
                               )})`,
                               backgroundSize: `contain`,
                               backgroundRepeat: `no-repeat`,
@@ -948,7 +994,8 @@ export default function Tv() {
                           <DetailMovieBottom>
                             <DetailMovieTitle>
                               {decodeURIComponent(
-                                moviePathMatch.params.title || "error - 1"
+                                moviePathMatch.params.original_name ||
+                                  "error - 1"
                               )}
                             </DetailMovieTitle>
                           </DetailMovieBottom>

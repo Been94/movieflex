@@ -30,94 +30,23 @@ export interface IHomeMoviesResult {
   total_results: number;
 }
 
-export interface ITvLatest {
+export interface ITv {
   adult: boolean;
   backdrop_path: string;
   id: number;
-  origin_country: [];
   original_language: string;
   original_name: string;
   overview: string;
   popularity: number;
   poster_path: string;
   first_air_date: string;
-  name: string;
   vote_average: number;
   vote_count: number;
 }
 
-export interface ITvLatestResult {
+export interface ITvResult {
   page: number;
-  results: ITvLatest[];
-  total_pages: number;
-  total_results: number;
-}
-
-export interface ITvAiringToday {
-  adult: Boolean;
-  backdrop_path: string;
-  id: number;
-  origin_country: [];
-  original_language: string;
-  original_name: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  first_air_date: string;
-  name: string;
-  vote_average: number;
-  vote_count: number;
-}
-
-export interface ITvAiringTodayResult {
-  page: number;
-  results: ITvAiringToday[];
-  total_pages: number;
-  total_results: number;
-}
-
-export interface ITvPopular {
-  adult: boolean;
-  backdrop_path: string;
-  id: number;
-  origin_country: [];
-  original_language: string;
-  original_name: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  first_air_date: string;
-  name: string;
-  vote_average: number;
-  vote_count: number;
-}
-
-export interface ITvPopularResult {
-  page: number;
-  results: ITvPopular[];
-  total_pages: number;
-  total_results: number;
-}
-
-export interface ITvTopRated {
-  adult: boolean;
-  backdrop_path: string;
-  id: number;
-  origin_country: [];
-  original_language: string;
-  original_name: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  first_air_date: string;
-  name: string;
-  vote_average: number;
-  vote_count: number;
-}
-
-export interface ITvTopRatedResult {
-  page: number;
-  results: ITvTopRated[];
+  results: ITv[];
   total_pages: number;
   total_results: number;
 }

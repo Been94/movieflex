@@ -8,7 +8,17 @@ import {
   useMotionValueEvent,
   useScroll,
 } from "framer-motion";
-import { useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  HTMLAttributes,
+  InputHTMLAttributes,
+  ReactHTML,
+  ReactHTMLElement,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { keyboard } from "@testing-library/user-event/dist/keyboard";
 
 const Nav = styled(motion.nav)`
   display: flex;
@@ -132,8 +142,14 @@ export default function Header() {
   const inputAnimation = useAnimation();
   const navAnimation = useAnimation();
   const { scrollY } = useScroll();
+  const [text, setText] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const toggleSearch = () => {
+  const inputFocusFn = () => {
+    if (inputRef.current !== null) inputRef.current.focus();
+  };
+
+  function toggleSearch() {
     if (searchOpen) {
       inputAnimation.start("open");
       //   animate={{ scaleX: searchOpen ? 1 : 0 }}
@@ -141,7 +157,7 @@ export default function Header() {
       inputAnimation.start("close");
     }
     setSearchOpen((current) => !current);
-  };
+  }
 
   useMotionValueEvent(scrollY, "change", () => {
     if (scrollY.get() > 80) {
@@ -152,6 +168,18 @@ export default function Header() {
 
     console.log(scrollY.get());
   });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setText(value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      //window.alert(text);
+      setText("");
+    }
+  };
 
   return (
     <>
@@ -189,7 +217,7 @@ export default function Header() {
           </Items>
         </Col>
         <Col>
-          <Search>
+          <Search onClick={inputFocusFn}>
             <motion.svg
               onClick={toggleSearch}
               animate={{ x: searchOpen ? -200 : 0 }}
@@ -210,7 +238,11 @@ export default function Header() {
               transition={{ type: "linear " }}
               initial={{ scaleX: 0 }}
               //   animate={{ scaleX: searchOpen ? 1 : 0 }}
-              placeholder="input!"
+              placeholder="Enter and enter!"
+              ref={inputRef}
+              value={text}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
             />
           </Search>
         </Col>

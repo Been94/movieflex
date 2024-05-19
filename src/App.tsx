@@ -31,7 +31,15 @@ function App() {
             </Route>
           </Route>
 
-          <Route path="/search" element={<Search />}></Route>
+          <Route path="/search" element={<Search />}>
+            <Route
+              path="latest/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
+              element={<Search />}
+            >
+              <Route path="search/movie/:id" element={<Search />} />
+              <Route path="search/tv/:id" element={<Search />} />
+            </Route>
+          </Route>
         </Routes>
       </Router>
     </>

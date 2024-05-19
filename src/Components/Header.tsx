@@ -18,7 +18,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { keyboard } from "@testing-library/user-event/dist/keyboard";
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 
 const Nav = styled(motion.nav)`
   display: flex;
@@ -68,7 +69,7 @@ const Item = styled.li`
   }
 `;
 
-const Search = styled.span`
+const Search = styled.form`
   color: white;
   display: flex;
   align-items: center;
@@ -135,19 +136,19 @@ const Input = styled(motion.input)`
   border: 1px solid ${(props) => props.theme.white.lighter};
 `;
 
+interface IForm {
+  keyword: string;
+}
+
 export default function Header() {
+  const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const homeMatch: PathMatch<string> | null = useMatch("/");
   const tvMatch: PathMatch<string> | null = useMatch("tv");
   const inputAnimation = useAnimation();
   const navAnimation = useAnimation();
   const { scrollY } = useScroll();
-  const [text, setText] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const inputFocusFn = () => {
-    if (inputRef.current !== null) inputRef.current.focus();
-  };
+  const { register, handleSubmit, setFocus, resetField } = useForm<IForm>();
 
   function toggleSearch() {
     if (searchOpen) {
@@ -157,6 +158,7 @@ export default function Header() {
       inputAnimation.start("close");
     }
     setSearchOpen((current) => !current);
+    setFocus("keyword");
   }
 
   useMotionValueEvent(scrollY, "change", () => {
@@ -169,16 +171,10 @@ export default function Header() {
     console.log(scrollY.get());
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setText(value);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      //window.alert(text);
-      setText("");
-    }
+  const onValid = (data: IForm) => {
+    navigate(`/search?keyword=${data.keyword}`);
+    resetField("keyword", { keepTouched: true });
+    toggleSearch();
   };
 
   return (
@@ -217,7 +213,8 @@ export default function Header() {
           </Items>
         </Col>
         <Col>
-          <Search onClick={inputFocusFn}>
+          {/* <Search onClick={inputFocusFn}> */}
+          <Search onSubmit={handleSubmit(onValid)}>
             <motion.svg
               onClick={toggleSearch}
               animate={{ x: searchOpen ? -200 : 0 }}
@@ -233,16 +230,17 @@ export default function Header() {
               ></path>
             </motion.svg>
             <Input
+              {...register("keyword", { required: true, minLength: 2 })}
               variants={toggleVariants}
               animate={inputAnimation}
               transition={{ type: "linear " }}
               initial={{ scaleX: 0 }}
               //   animate={{ scaleX: searchOpen ? 1 : 0 }}
               placeholder="Enter and enter!"
-              ref={inputRef}
-              value={text}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
+              // ref={inputRef}
+              // value={text}
+              //onChange={handleInputChange}
+              //onKeyDown={handleKeyDown}
             />
           </Search>
         </Col>

@@ -267,3 +267,10 @@ export function getTvTopRated() {
     (res) => res.json()
   );
 }
+
+export function getSearchMovie(keyword: string) {
+  return fetch(
+    `${BASE_PATH}/search/movie?query=${keyword}&include_adult=false&language=en-US&page=1`,
+    options
+  ).then((res) => res.json());
+}

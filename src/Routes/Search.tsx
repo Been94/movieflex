@@ -795,7 +795,12 @@ export default function Search() {
                                 )}
                               </div>
                             </div>
-                            <div>
+                            <div
+                              style={{
+                                textOverflow: "ellipsis",
+                                overflow: "hidden",
+                              }}
+                            >
                               {decodeURIComponent(
                                 moviePathMatch.params.overview || ""
                               )}

@@ -7,7 +7,7 @@ export async function bgArrayRandom(min: number, max: number) {
 
 export function dummyDataMsgMake(value: string, errorMsg: string) {
   if (value === "" || value === undefined) {
-    return `${errorMsg} is noData!`;
+    return `Nothing yet. Please wait a little longer. ;)`;
   } else {
     return value;
   }

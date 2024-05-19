@@ -243,3 +243,27 @@ export function getMoviesUpcoming() {
     options
   ).then((res) => res.json());
 }
+
+export function getTv() {
+  return fetch(
+    `${BASE_PATH}/tv/on_the_air?language=en-US&page=1`,
+    options
+  ).then((res) => res.json());
+}
+
+export function getTvAiringToday() {
+  return fetch(
+    `${BASE_PATH}/tv/airing_today?language=en-US&page=1`,
+    options
+  ).then((res) => res.json());
+}
+export function getTvPopular() {
+  return fetch(`${BASE_PATH}/tv/popular?language=en-US&page=1`, options).then(
+    (res) => res.json()
+  );
+}
+export function getTvTopRated() {
+  return fetch(`${BASE_PATH}/tv/top_rated?language=en-US&page=1`, options).then(
+    (res) => res.json()
+  );
+}

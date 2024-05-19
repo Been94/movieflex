@@ -5,7 +5,7 @@ import {
   getMoviesUpcoming,
 } from "../api";
 import styled from "styled-components";
-import { Status, bgArrayRandom, makeImgPath } from "./Util";
+import { movieStatus, bgArrayRandom, makeImgPath } from "./Util";
 import { useQuery } from "@tanstack/react-query";
 import { useLayoutEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -382,15 +382,15 @@ export default function Home() {
 
   const leftIndex = (index: number, value: string, data: any) => {
     if (data) {
-      if (value === Status.latest) {
+      if (value === movieStatus.latest) {
         latestToggleLeving();
       }
 
-      if (value === Status.topRated) {
+      if (value === movieStatus.topRated) {
         topRatedToggleLeving();
       }
 
-      if (value === Status.upComming) {
+      if (value === movieStatus.upComming) {
         upCommingLeavingToggleLeving();
       }
 
@@ -400,23 +400,23 @@ export default function Home() {
       if (index === 0) {
         return;
       } else if (index > 0) {
-        if (value === Status.latest) {
+        if (value === movieStatus.latest) {
           return setLatestIndex((current) => current - 1);
         }
-        if (value === Status.topRated) {
+        if (value === movieStatus.topRated) {
           return setTopRatedIndex((current) => current - 1);
         }
-        if (value === Status.upComming) {
+        if (value === movieStatus.upComming) {
           return setUpCommingIndex((current) => current - 1);
         }
       } else if (index === maxIndex) {
-        if (value === Status.latest) {
+        if (value === movieStatus.latest) {
           return setLatestIndex(0);
         }
-        if (value === Status.topRated) {
+        if (value === movieStatus.topRated) {
           return setTopRatedIndex(0);
         }
-        if (value === Status.upComming) {
+        if (value === movieStatus.upComming) {
           return setUpCommingIndex(0);
         }
       }
@@ -425,15 +425,15 @@ export default function Home() {
 
   const rightIndex = (index: number, value: string, data: any) => {
     if (data) {
-      if (value === Status.latest) {
+      if (value === movieStatus.latest) {
         latestToggleLeving();
       }
 
-      if (value === Status.topRated) {
+      if (value === movieStatus.topRated) {
         topRatedToggleLeving();
       }
 
-      if (value === Status.upComming) {
+      if (value === movieStatus.upComming) {
         upCommingLeavingToggleLeving();
       }
       const totalMovies = data.results.length;
@@ -442,23 +442,23 @@ export default function Home() {
       console.log(maxIndex);
 
       if (index >= 0) {
-        if (value === Status.latest) {
+        if (value === movieStatus.latest) {
           return setLatestIndex((current) => current + 1);
         }
-        if (value === Status.topRated) {
+        if (value === movieStatus.topRated) {
           return setTopRatedIndex((current) => current + 1);
         }
-        if (value === Status.upComming) {
+        if (value === movieStatus.upComming) {
           return setUpCommingIndex((current) => current + 1);
         }
       } else if (index === maxIndex) {
-        if (value === Status.latest) {
+        if (value === movieStatus.latest) {
           return setLatestIndex(0);
         }
-        if (value === Status.topRated) {
+        if (value === movieStatus.topRated) {
           return setTopRatedIndex(0);
         }
-        if (value === Status.upComming) {
+        if (value === movieStatus.upComming) {
           return setUpCommingIndex(0);
         }
       }
@@ -530,7 +530,11 @@ export default function Home() {
                       {latestIndex > 0 ? (
                         <LeftBtn
                           onClick={() =>
-                            leftIndex(latestIndex, Status.latest, latestData)
+                            leftIndex(
+                              latestIndex,
+                              movieStatus.latest,
+                              latestData
+                            )
                           }
                         >
                           <span>{"<"}</span>
@@ -578,7 +582,11 @@ export default function Home() {
                       {latestIndex === maxIndex ? null : (
                         <RightBtn
                           onClick={() =>
-                            rightIndex(latestIndex, Status.latest, latestData)
+                            rightIndex(
+                              latestIndex,
+                              movieStatus.latest,
+                              latestData
+                            )
                           }
                         >
                           <span>{">"}</span>
@@ -609,8 +617,8 @@ export default function Home() {
                           onClick={() =>
                             leftIndex(
                               topRatedIndex,
-                              Status.topRated,
-                              latestData
+                              movieStatus.topRated,
+                              topRatedData
                             )
                           }
                         >
@@ -661,8 +669,8 @@ export default function Home() {
                           onClick={() =>
                             rightIndex(
                               topRatedIndex,
-                              Status.topRated,
-                              latestData
+                              movieStatus.topRated,
+                              topRatedData
                             )
                           }
                         >
@@ -695,8 +703,8 @@ export default function Home() {
                           onClick={() =>
                             leftIndex(
                               upCommingIndex,
-                              Status.upComming,
-                              latestData
+                              movieStatus.upComming,
+                              upCommingData
                             )
                           }
                         >
@@ -747,8 +755,8 @@ export default function Home() {
                           onClick={() =>
                             rightIndex(
                               upCommingIndex,
-                              Status.upComming,
-                              latestData
+                              movieStatus.upComming,
+                              upCommingData
                             )
                           }
                         >

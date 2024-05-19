@@ -21,8 +21,16 @@ function App() {
             </Route>
           </Route>
           <Route path="/tv" element={<Tv />}>
-            <Route path="tv/:id" element={<Home />} />
+            <Route
+              path="latest/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
+              element={<Tv />}
+            >
+              <Route path="tv/airing_today/:id" element={<Tv />} />
+              <Route path="tv/popular/:id" element={<Tv />} />
+              <Route path="tv/top_rated/:id" element={<Tv />} />
+            </Route>
           </Route>
+
           <Route path="/search" element={<Search />}></Route>
         </Routes>
       </Router>

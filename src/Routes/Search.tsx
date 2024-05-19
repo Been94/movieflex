@@ -738,16 +738,42 @@ export default function Search() {
                               )}
                             </IsAdultDetail>
                           </IsAdult>
-                          <div
-                            style={{
-                              backgroundImage: `url(${makeImgPath(
-                                "/" + moviePathMatch.params.urlPath!
-                              )})`,
-                              backgroundSize: `contain`,
-                              backgroundRepeat: `no-repeat`,
-                              backgroundPosition: "center",
-                            }}
-                          />
+                          {moviePathMatch.params.urlPath === "null" ? (
+                            <>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  width: "100%",
+                                  height: "100%",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <span
+                                  style={{ color: "white", fontSize: "28px" }}
+                                >
+                                  {
+                                    "Nothing yet. Please wait a little longer. ;)"
+                                  }
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div
+                                style={{
+                                  backgroundImage: `url(${makeImgPath(
+                                    "/" + moviePathMatch.params.urlPath!
+                                  )})`,
+                                  backgroundSize: `contain`,
+                                  backgroundRepeat: `no-repeat`,
+                                  backgroundPosition: "center",
+                                }}
+                              />
+                            </>
+                          )}
+
                           <DetailMovieBottom>
                             <DetailMovieTitle>
                               {moviePathMatch.params.title === undefined ? (
@@ -770,10 +796,20 @@ export default function Search() {
                               }}
                             >
                               <div>
-                                <span>
-                                  출시일: &nbsp;
-                                  {moviePathMatch.params.Date}
-                                </span>
+                                {moviePathMatch.params.Date?.includes(
+                                  "Nothing"
+                                ) ? (
+                                  <>
+                                    <div />
+                                  </>
+                                ) : (
+                                  <>
+                                    <span>
+                                      출시일: &nbsp;
+                                      {moviePathMatch.params.Date}
+                                    </span>
+                                  </>
+                                )}
                               </div>
                               <div>
                                 <FaChessQueen /> &nbsp;

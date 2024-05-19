@@ -7,7 +7,6 @@ export interface IHomeMovies {
   id: number;
   backdrop_path: string;
   poster_path: string;
-  title: string;
   overview: string;
   original_title: string;
   original_language: string;

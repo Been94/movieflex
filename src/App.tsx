@@ -13,7 +13,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />}>
             <Route
-              path="movie/latest/:id/:title/:releaseDate/:language/:popularity/:voteAverage/:voteCount/:posterPath/:adult"
+              path="movie/latest/:movieId/:original_title/:original_language/:overview/:poster_path/:backdrop_path/:release_date/:popularity/:vote_average/:vote_count/:adult"
               element={<Home />}
             >
               <Route path="movie/top_rated/:id" element={<Home />} />

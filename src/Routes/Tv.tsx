@@ -137,12 +137,6 @@ const RightBtn = styled(motion.div)`
     align-items: center;
   }
 `;
-const Box2 = styled(motion.div)`
-  background-color: white;
-  height: 200px;
-  color: red;
-  font-size: 66px;
-`;
 
 const Box = styled(motion.div)<{ bgphoto: string }>`
   background-color: white;
@@ -231,18 +225,6 @@ const DetailMovieBottom = styled.div`
 
 const DetailMovieTitle = styled.div`
   font-size: xx-large;
-`;
-
-const NowPlaying = styled.div`
-  margin: 10px;
-  font-weight: bold;
-`;
-
-const SliderBackground = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
 `;
 
 const latestRowVariants = {
@@ -344,7 +326,7 @@ export default function Tv() {
   const moviePathMatch: PathMatch<string> | null = useMatch(
     "/tv/latest/:id/:original_name/:original_language/:overview/:popularity/:poster_path/:first_air_date/:popularity/:vote_average/:vote_count/:adult"
   );
-  console.log(moviePathMatch);
+  //console.log(moviePathMatch);
 
   const [randomNumber, setRandomNumber] = useState(0);
   const [maxIndex, setMaxIndex] = useState(0);
@@ -353,11 +335,6 @@ export default function Tv() {
   const [tvAiringTodayIndex, setTvAiringTodayIndex] = useState(0);
   const [tvPopularIndex, setTvPopularIndex] = useState(0);
   const [tvTopRatedIndex, setTvTopRatedIndex] = useState(0);
-
-  const [tvLatestLeaving, setTvLatestLeaving] = useState(false);
-  const [tvAiringTodayLeaving, setTvAiringTodayLeaving] = useState(false);
-  const [tvPopularLeaving, setTvPopularLeaving] = useState(false);
-  const [tvTopRatedLeaving, setTvTopRatedLeaving] = useState(false);
 
   const useGetTvQuerys = () => {
     const tvLatest = useQuery<ITvResult>({
@@ -400,23 +377,10 @@ export default function Tv() {
       setRandomNumber(() => result);
       const maxIndex = Math.floor(tvLatestData?.results.length! / offset) - 1;
       setMaxIndex(maxIndex);
-      // console.log(result);
-      //console.log("topRated:", topRatedData?.results.length);
     }
 
     bgArrayRandomFunction();
-  }, []);
-
-  const tvLatestToggleLeving = () => setTvLatestLeaving((current) => !current);
-
-  const tvAiringTodayToggleLeving = () =>
-    setTvAiringTodayLeaving((current) => !current);
-
-  const tvPopularToggleLeving = () =>
-    setTvPopularLeaving((current) => !current);
-
-  const tvTopRatedToggleLeving = () =>
-    setTvTopRatedLeaving((current) => !current);
+  }, [tvLatestData?.results.length]);
 
   // adult: 성인여부,
   // id: 고유번호,
@@ -491,20 +455,20 @@ export default function Tv() {
 
   const leftIndex = (index: number, value: string, data: any) => {
     if (data) {
-      if (value === tvStatus.latest) {
-        tvLatestToggleLeving();
-      }
+      // if (value === tvStatus.latest) {
+      //   tvLatestToggleLeving();
+      // }
 
-      if (value === tvStatus.airingToday) {
-        tvAiringTodayToggleLeving();
-      }
+      // if (value === tvStatus.airingToday) {
+      //   tvAiringTodayToggleLeving();
+      // }
 
-      if (value === tvStatus.popular) {
-        tvPopularToggleLeving();
-      }
-      if (value === tvStatus.rated) {
-        tvTopRatedToggleLeving();
-      }
+      // if (value === tvStatus.popular) {
+      //   tvPopularToggleLeving();
+      // }
+      // if (value === tvStatus.rated) {
+      //   tvTopRatedToggleLeving();
+      // }
 
       const totalMovies = data.results.length;
       const maxIndex = Math.floor(totalMovies / offset) - 1;
@@ -543,20 +507,20 @@ export default function Tv() {
 
   const rightIndex = (index: number, value: string, data: any) => {
     if (data) {
-      if (value === tvStatus.latest) {
-        tvLatestToggleLeving();
-      }
+      // if (value === tvStatus.latest) {
+      //   tvLatestToggleLeving();
+      // }
 
-      if (value === tvStatus.airingToday) {
-        tvAiringTodayToggleLeving();
-      }
+      // if (value === tvStatus.airingToday) {
+      //   tvAiringTodayToggleLeving();
+      // }
 
-      if (value === tvStatus.popular) {
-        tvPopularToggleLeving();
-      }
-      if (value === tvStatus.rated) {
-        tvTopRatedToggleLeving();
-      }
+      // if (value === tvStatus.popular) {
+      //   tvPopularToggleLeving();
+      // }
+      // if (value === tvStatus.rated) {
+      //   tvTopRatedToggleLeving();
+      // }
       const totalMovies = data.results.length;
       const maxIndex = Math.floor(totalMovies / offset) - 1;
       setMaxIndex(maxIndex);
@@ -595,7 +559,10 @@ export default function Tv() {
   return (
     <>
       <Wrapper>
-        {loadingLatest && loadingTopRated ? (
+        {loadingLatest &&
+        loadingTopRated &&
+        loadingAiringToday &&
+        loadingPopular ? (
           <>
             <Loader>
               <span>로딩중</span>
@@ -636,7 +603,7 @@ export default function Tv() {
                 <TvLatestSlider>
                   <AnimatePresence
                     initial={false}
-                    onExitComplete={tvLatestToggleLeving}
+                    //onExitComplete={tvLatestToggleLeving}
                   >
                     <span style={{ position: "absolute", top: "-260px" }}>
                       LatestTV
@@ -695,7 +662,6 @@ export default function Tv() {
                               "w500"
                             )}
                           >
-                            <img />
                             <Info variants={infoVariants}>
                               <h4>{tv.original_name}</h4>
                             </Info>
@@ -722,7 +688,7 @@ export default function Tv() {
                 <TvTopRatedSlider>
                   <AnimatePresence
                     initial={false}
-                    onExitComplete={tvAiringTodayToggleLeving}
+                    // onExitComplete={tvAiringTodayToggleLeving}
                   >
                     <span style={{ position: "absolute", bottom: "5px" }}>
                       TopRateTV
@@ -781,7 +747,6 @@ export default function Tv() {
                               "w500"
                             )}
                           >
-                            <img />
                             <Info variants={infoVariants}>
                               <h4>{tv.original_name}</h4>
                             </Info>
@@ -808,7 +773,7 @@ export default function Tv() {
                 <TvPopularSlider>
                   <AnimatePresence
                     initial={false}
-                    onExitComplete={tvPopularToggleLeving}
+                    // onExitComplete={tvPopularToggleLeving}
                   >
                     <span style={{ position: "absolute", bottom: "-240px" }}>
                       Popular
@@ -868,7 +833,6 @@ export default function Tv() {
                               "w500"
                             )}
                           >
-                            <img />
                             <Info variants={infoVariants}>
                               <h4>{tv.original_name}</h4>
                             </Info>
@@ -895,7 +859,7 @@ export default function Tv() {
                 <TvAiringTodaySlider>
                   <AnimatePresence
                     initial={false}
-                    onExitComplete={tvTopRatedToggleLeving}
+                    //onExitComplete={tvTopRatedToggleLeving}
                   >
                     <span style={{ position: "absolute", bottom: "-490px" }}>
                       Airing Today
@@ -955,7 +919,6 @@ export default function Tv() {
                               "w500"
                             )}
                           >
-                            <img />
                             <Info variants={infoVariants}>
                               <h4>{tv.original_name}</h4>
                             </Info>
@@ -989,7 +952,7 @@ export default function Tv() {
                         exit="exit"
                         onClick={onOverlayClick}
                       />
-                      <BigMovie layoutId={moviePathMatch.params.movieId}>
+                      <BigMovie layoutId={moviePathMatch.params.id}>
                         <DetailMovie>
                           <IsAdult>
                             <div style={{ marginLeft: "10px" }}>

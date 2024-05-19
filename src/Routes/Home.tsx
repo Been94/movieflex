@@ -125,12 +125,6 @@ const RightBtn = styled(motion.div)`
     align-items: center;
   }
 `;
-const Box2 = styled(motion.div)`
-  background-color: white;
-  height: 200px;
-  color: red;
-  font-size: 66px;
-`;
 
 const Box = styled(motion.div)<{ bgphoto: string }>`
   background-color: white;
@@ -221,18 +215,6 @@ const DetailMovieTitle = styled.div`
   font-size: xx-large;
 `;
 
-const NowPlaying = styled.div`
-  margin: 10px;
-  font-weight: bold;
-`;
-
-const SliderBackground = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-`;
-
 const latestRowVariants = {
   hidden: {
     x: window.outerWidth,
@@ -320,7 +302,7 @@ export default function Home() {
   const moviePathMatch: PathMatch<string> | null = useMatch(
     "/movie/latest/:movieId/:original_title/:original_language/:overview/:poster_path/:backdrop_path/:release_date/:popularity/:vote_average/:vote_count/:adult"
   );
-  console.log(moviePathMatch);
+  //console.log(moviePathMatch);
 
   const [randomNumber, setRandomNumber] = useState(0);
   const [latestIndex, setLatestIndex] = useState(0);
@@ -358,7 +340,7 @@ export default function Home() {
     async function bgArrayRandomFunction() {
       const result = await bgArrayRandom(
         0,
-        latestData?.results.length! - 1 || 19
+        Number(latestData?.results.length) - 1 || 19
       );
       setRandomNumber(() => result);
       const maxIndex = Math.floor(latestData?.results.length! / offset) - 1;
@@ -366,7 +348,7 @@ export default function Home() {
     }
 
     bgArrayRandomFunction();
-  }, []);
+  }, [latestData?.results.length]);
 
   const onBoxClicked = (
     movieId: number,
@@ -381,44 +363,44 @@ export default function Home() {
     original_language: string,
     release_date: string
   ) => {
-    if (original_title != undefined) {
+    if (original_title !== undefined) {
       original_title = original_title.replace("/", "");
       original_title = original_title.replace(":", "");
     }
-    if (original_language != undefined) {
+    if (original_language !== undefined) {
       original_language = original_language.replace("/", "");
       original_language = original_language.replace(":", "");
     }
-    if (overview != undefined) {
+    if (overview !== undefined) {
       overview = overview.replace("/", "");
       overview = overview.replace(":", "");
     }
-    if (poster_path != undefined) {
+    if (poster_path !== undefined) {
       poster_path = poster_path.replace("/", "");
       poster_path = poster_path.replace(":", "");
     }
-    if (backdrop_path != undefined) {
+    if (backdrop_path !== undefined) {
       backdrop_path = backdrop_path.replace("/", "");
       backdrop_path = backdrop_path.replace(":", "");
     }
-    if (release_date != undefined) {
+    if (release_date !== undefined) {
       release_date = release_date.replace("/", "");
       release_date = release_date.replace(":", "");
     }
 
-    console.log("movieId", movieId);
-    console.log("popularity", popularity);
-    console.log("vote_average", vote_average);
-    console.log("vote_count", vote_count);
+    // console.log("movieId", movieId);
+    // console.log("popularity", popularity);
+    // console.log("vote_average", vote_average);
+    // console.log("vote_count", vote_count);
 
-    console.log("adult", adult);
-    console.log("backdrop_path", backdrop_path);
-    console.log("poster_path", poster_path);
+    // console.log("adult", adult);
+    // console.log("backdrop_path", backdrop_path);
+    // console.log("poster_path", poster_path);
 
-    console.log("overview", overview);
-    console.log("original_title", original_title);
-    console.log("original_language", original_language);
-    console.log("release_date", release_date);
+    // console.log("overview", overview);
+    // console.log("original_title", original_title);
+    // console.log("original_language", original_language);
+    // console.log("release_date", release_date);
 
     popularity = Math.round(popularity);
     vote_average = Math.floor(Math.round(vote_average) / 2);
@@ -433,7 +415,7 @@ export default function Home() {
       overview = overview + "...";
     }
 
-    console.log(overview.length);
+    // console.log(overview.length);
 
     navigate(
       `/movie/latest/${movieId}/${dummyDataMsgMake(
@@ -488,7 +470,7 @@ export default function Home() {
       const totalMovies = data.results.length;
       const maxIndex = Math.floor(totalMovies / offset) - 1;
       setMaxIndex(maxIndex);
-      console.log(maxIndex);
+      //  console.log(maxIndex);
 
       if (index >= 0) {
         if (value === movieStatus.latest) {
@@ -615,7 +597,6 @@ export default function Home() {
                               "w500"
                             )}
                           >
-                            <img />
                             <Info variants={infoVariants}>
                               <h4>{movie.original_title}</h4>
                             </Info>
@@ -699,7 +680,6 @@ export default function Home() {
                               "w500"
                             )}
                           >
-                            <img />
                             <Info variants={infoVariants}>
                               <h4>{movie.original_title}</h4>
                             </Info>
@@ -784,7 +764,6 @@ export default function Home() {
                               "w500"
                             )}
                           >
-                            <img />
                             <Info variants={infoVariants}>
                               <h4>{movie.original_title}</h4>
                             </Info>

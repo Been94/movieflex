@@ -17,16 +17,6 @@ const Loader = styled.div`
   height: 20vh;
 `;
 
-const Title = styled.h2`
-  font-size: 68px;
-  margin-bottom: 20px;
-`;
-
-const Overview = styled.p`
-  font-size: 30px;
-  width: 50%;
-`;
-
 const SearchTvSlider = styled.div`
   position: relative;
 `;
@@ -87,12 +77,6 @@ const RightBtn = styled(motion.div)`
     justify-content: center;
     align-items: center;
   }
-`;
-const Box2 = styled(motion.div)`
-  background-color: white;
-  height: 200px;
-  color: red;
-  font-size: 66px;
 `;
 
 const Box = styled(motion.div)<{ bgphoto: string }>`
@@ -185,18 +169,6 @@ const DetailMovieTitle = styled.div`
   font-size: xx-large;
 `;
 
-const NowPlaying = styled.div`
-  margin: 10px;
-  font-weight: bold;
-`;
-
-const SliderBackground = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-`;
-
 const SearchTvRowVariants = {
   hidden: {
     x: window.outerWidth,
@@ -265,6 +237,7 @@ const rating = (score: number) => {
   }
   return result;
 };
+const searchOffSet = 6;
 export default function Search() {
   const navigate = useNavigate();
   const moviePathMatch: PathMatch<string> | null = useMatch(
@@ -275,24 +248,15 @@ export default function Search() {
   const [searchParams, _] = useSearchParams();
   const keyword = searchParams.get("keyword");
   const [maxIndex, setMaxIndex] = useState(0);
-  const [searchOffSet, setSearchOffSet] = useState(6);
-
   const [searchTvIndex, setSearchTvIndex] = useState(0);
   const [searchMovieIndex, setSearchMovieIndex] = useState(0);
-
-  const [searchTvLeaving, setSearchTvLeaving] = useState(false);
-  const [searchMovieLeaving, setSearchMovieLeaving] = useState(false);
-
-  const searchTvToggleLeving = () => setSearchTvLeaving((current) => !current);
-  const searchMovieToggleLeving = () =>
-    setSearchMovieLeaving((current) => !current);
 
   const useGetSearchQuery = () => {
     const searchTv = useQuery<ISearchResult>({
       queryKey: ["search", "tv"],
       queryFn: async () => {
         const response = await getSearchTv(keyword!);
-        console.log(response);
+        //console.log(response);
         return response;
       },
     });
@@ -300,7 +264,7 @@ export default function Search() {
       queryKey: ["search", "movie"],
       queryFn: async () => {
         const response = await getSearchMovie(keyword!);
-        console.log(response);
+        //console.log(response);
         return response;
       },
     });
@@ -332,44 +296,80 @@ export default function Search() {
     title: string,
     name: string
   ) => {
-    if (backdrop_path != undefined) {
-      backdrop_path = backdrop_path.replace("/", "");
+    console.log("adult", adult);
+    console.log("searchId", searchId);
+    console.log("popularity", popularity);
+    console.log("vote_average", vote_average);
+    console.log("vote_count", vote_count);
+    console.log("backdrop_path", backdrop_path);
+    console.log("original_language", original_language);
+    console.log("original_title", original_title);
+    console.log("original_name", original_name);
+    console.log("overview", overview);
+    console.log("poster_path", poster_path);
+    console.log("first_air_date", first_air_date);
+    console.log("release_date", release_date);
+    console.log("title", title);
+    console.log("name", name);
+
+    if (backdrop_path !== undefined) {
+      if (backdrop_path !== null) {
+        backdrop_path = backdrop_path.replace("/", "");
+      }
     }
 
-    if (original_language != undefined) {
-      original_language = original_language.replace("/", "");
+    if (original_language !== undefined) {
+      if (original_language !== null) {
+        original_language = original_language.replace("/", "");
+      }
     }
 
-    if (original_title != undefined) {
-      original_title = original_title.replace("/", "");
+    if (original_title !== undefined) {
+      if (original_title !== null) {
+        original_title = original_title.replace("/", "");
+      }
     }
 
-    if (original_name != undefined) {
-      original_name = original_name.replace("/", "");
+    if (original_name !== undefined) {
+      if (original_name !== null) {
+        original_name = original_name.replace("/", "");
+      }
     }
 
-    if (overview != undefined) {
-      overview = overview.replace("/", "");
+    if (overview !== undefined) {
+      if (overview !== null) {
+        overview = overview.replace("/", "");
+      }
     }
 
-    if (poster_path != undefined) {
-      poster_path = poster_path.replace("/", "");
+    if (poster_path !== undefined) {
+      if (poster_path !== null) {
+        poster_path = poster_path.replace("/", "");
+      }
     }
 
-    if (first_air_date != undefined) {
-      first_air_date = first_air_date.replace("/", "");
+    if (first_air_date !== undefined) {
+      if (first_air_date !== null) {
+        first_air_date = first_air_date.replace("/", "");
+      }
     }
 
-    if (release_date != undefined) {
-      release_date = release_date.replace("/", "");
+    if (release_date !== undefined) {
+      if (release_date !== null) {
+        release_date = release_date.replace("/", "");
+      }
     }
 
-    if (title != undefined) {
-      title = title.replace("/", "");
+    if (title !== undefined) {
+      if (title !== null) {
+        title = title.replace("/", "");
+      }
     }
 
-    if (name != undefined) {
-      name = name.replace("/", "");
+    if (name !== undefined) {
+      if (name !== null) {
+        name = name.replace("/", "");
+      }
     }
 
     popularity = Math.round(popularity);
@@ -444,12 +444,6 @@ export default function Search() {
 
   const leftIndex = (index: number, value: string, data: any) => {
     if (data) {
-      if (value === searchStatus.searchTv) {
-        searchTvToggleLeving();
-      }
-      if (value === searchStatus.searchMovie) {
-        searchMovieToggleLeving();
-      }
       const totalMovies = data.results.length;
       const maxIndex = Math.floor(totalMovies / searchOffSet) - 1;
       setMaxIndex(maxIndex);
@@ -475,12 +469,6 @@ export default function Search() {
 
   const rightIndex = (index: number, value: string, data: any) => {
     if (data) {
-      if (value === searchStatus.searchTv) {
-        searchTvToggleLeving();
-      }
-      if (value === searchStatus.searchMovie) {
-        searchMovieToggleLeving();
-      }
       const totalMovies = data.results.length;
       const maxIndex = Math.floor(totalMovies / searchOffSet) - 1;
       setMaxIndex(maxIndex);
@@ -534,10 +522,7 @@ export default function Search() {
                 }}
               >
                 <SearchTvSlider>
-                  <AnimatePresence
-                    initial={false}
-                    onExitComplete={searchTvToggleLeving}
-                  >
+                  <AnimatePresence initial={false}>
                     <span style={{ position: "absolute", top: "-260px" }}>
                       LatestMovie
                     </span>
@@ -600,7 +585,6 @@ export default function Search() {
                               "w500"
                             )}
                           >
-                            <img />
                             <Info variants={infoVariants}>
                               <h4>{searchTv.original_name}</h4>
                             </Info>
@@ -625,10 +609,7 @@ export default function Search() {
                 </SearchTvSlider>
 
                 <SearchMovieSlider>
-                  <AnimatePresence
-                    initial={false}
-                    onExitComplete={searchMovieToggleLeving}
-                  >
+                  <AnimatePresence initial={false}>
                     <span style={{ position: "absolute", bottom: "5px" }}>
                       SearchMovie
                     </span>
@@ -691,7 +672,6 @@ export default function Search() {
                               "w500"
                             )}
                           >
-                            <img />
                             <Info variants={infoVariants}>
                               <h4>{searchTv.original_name}</h4>
                             </Info>

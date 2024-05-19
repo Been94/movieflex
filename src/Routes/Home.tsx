@@ -536,9 +536,43 @@ export default function Home() {
                         </LeftBtn>
                       ) : null}
 
-                      {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <Box2 key={i}>{i}</Box2>
-                      ))}
+                      {latestData?.results
+                        .slice(
+                          offset * latestIndex,
+                          offset * latestIndex + offset
+                        )
+                        .map((movie) => (
+                          <Box
+                            layoutId={String(movie.id)}
+                            key={movie.id}
+                            onClick={() =>
+                              onBoxClicked(
+                                movie.id,
+                                movie.adult,
+                                movie.title,
+                                movie.original_language,
+                                movie.popularity,
+                                movie.release_date,
+                                movie.vote_average,
+                                movie.vote_count,
+                                movie.poster_path
+                              )
+                            }
+                            initial="normal"
+                            whileHover="hover"
+                            transition={{ type: "tween" }}
+                            variants={boxVariants}
+                            bgphoto={makeImgPath(
+                              movie.backdrop_path || "",
+                              "w500"
+                            )}
+                          >
+                            <img />
+                            <Info variants={infoVariants}>
+                              <h4>{movie.title}</h4>
+                            </Info>
+                          </Box>
+                        ))}
 
                       {latestIndex === maxIndex ? null : (
                         <RightBtn
@@ -653,6 +687,51 @@ export default function Home() {
                     </UpcommingRow>
                   </AnimatePresence>
                 </UpcommingSlider>
+                <AnimatePresence>
+                  {moviePathMatch ? (
+                    <>
+                      <Overlay
+                        variants={overlayVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        onClick={onOverlayClick}
+                      />
+                      <BigMovie layoutId={moviePathMatch.params.id}>
+                        <DetailMovie>
+                          <IsAdult>
+                            <IsAdultDetail
+                              isadult={Boolean(moviePathMatch.params.adult)}
+                            >
+                              {Boolean(moviePathMatch.params.adult) ? (
+                                <span>No Adult</span>
+                              ) : (
+                                <span>Adult</span>
+                              )}
+                            </IsAdultDetail>
+                          </IsAdult>
+                          <div
+                            style={{
+                              backgroundImage: `url(${makeImgPath(
+                                "/" + moviePathMatch.params.posterPath!
+                              )})`,
+                              backgroundSize: `contain`,
+                              backgroundRepeat: `no-repeat`,
+                              backgroundPosition: "center",
+                            }}
+                          />
+                          <DetailMovieBottom>
+                            <DetailMovieTitle>
+                              {decodeURIComponent(
+                                moviePathMatch.params.title || "error - 1"
+                              )}
+                            </DetailMovieTitle>
+                          </DetailMovieBottom>
+                        </DetailMovie>
+                      </BigMovie>
+                    </>
+                  ) : null}
+                </AnimatePresence>
               </div>
             </div>
           </>
